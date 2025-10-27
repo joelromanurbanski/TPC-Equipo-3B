@@ -41,7 +41,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccesoDatos.cs" />
+    <Compile Include="ArticuloSQL.cs" />
+    <Compile Include="CategoriaSQL.cs" />
+    <Compile Include="ClienteSQL.cs" />
+    <Compile Include="CompraSQL.cs" />
+    <Compile Include="ImagenSQL.cs" />
+    <Compile Include="MarcaSQL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProveedorSQL.cs" />
+    <Compile Include="VentaSQL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dominio\Dominio.csproj">
+      <Project>{6123d231-81a3-4c7b-bf82-98e807994c2f}</Project>
+      <Name>Dominio</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
