@@ -28,5 +28,6 @@ namespace Dominio
         {
             return Imagenes != null && Imagenes.Count > 0 ? Imagenes[0].UrlImagen : UrlImagen ?? "";
         }
+        public string ProveedorNombre { get; set; }
     }
 }
