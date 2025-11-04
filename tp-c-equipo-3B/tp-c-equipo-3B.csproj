@@ -120,9 +120,15 @@
     <Content Include="Content\Site.css" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
+    <Content Include="GestionClientes.aspx" />
     <Content Include="GestionProducto.aspx" />
+    <Content Include="GestionProveedores.aspx" />
+    <Content Include="GestionUsuarios.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="InicioSesión.aspx" />
+    <Content Include="PaneldeControl.aspx" />
     <Content Include="RegistroCompra.aspx" />
+    <Content Include="RegistroVenta.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -208,6 +214,13 @@
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="GestionClientes.aspx.cs">
+      <DependentUpon>GestionClientes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GestionClientes.aspx.designer.cs">
+      <DependentUpon>GestionClientes.aspx</DependentUpon>
+    </Compile>
     <Compile Include="GestionProducto.aspx.cs">
       <DependentUpon>GestionProducto.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -215,8 +228,36 @@
     <Compile Include="GestionProducto.aspx.designer.cs">
       <DependentUpon>GestionProducto.aspx</DependentUpon>
     </Compile>
+    <Compile Include="GestionProveedores.aspx.cs">
+      <DependentUpon>GestionProveedores.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GestionProveedores.aspx.designer.cs">
+      <DependentUpon>GestionProveedores.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GestionUsuarios.aspx.cs">
+      <DependentUpon>GestionUsuarios.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GestionUsuarios.aspx.designer.cs">
+      <DependentUpon>GestionUsuarios.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="InicioSesión.aspx.cs">
+      <DependentUpon>InicioSesión.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="InicioSesión.aspx.designer.cs">
+      <DependentUpon>InicioSesión.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaneldeControl.aspx.cs">
+      <DependentUpon>PaneldeControl.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PaneldeControl.aspx.designer.cs">
+      <DependentUpon>PaneldeControl.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistroCompra.aspx.cs">
@@ -225,6 +266,13 @@
     </Compile>
     <Compile Include="RegistroCompra.aspx.designer.cs">
       <DependentUpon>RegistroCompra.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RegistroVenta.aspx.cs">
+      <DependentUpon>RegistroVenta.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RegistroVenta.aspx.designer.cs">
+      <DependentUpon>RegistroVenta.aspx</DependentUpon>
     </Compile>
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
