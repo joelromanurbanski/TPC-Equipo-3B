@@ -1,7 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="GestionProveedores.aspx.cs" Inherits="tp_c_equipo_3B.GestionProveedores" %>
-
-<!DOCTYPE html>
-
+﻿<!DOCTYPE html>
 <html class="light" lang="es"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -11,29 +8,29 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
     tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#4A90E2",
-            "background-light": "#F5F7FA",
-            "background-dark": "#101922",
-            "success": "#50E3C2",
-            "danger": "#D0021B",
-            "text-primary": "#4A4A4A",
-            "text-secondary": "#9B9B9B"
-          },
-          fontFamily: {
-            "display": ["Inter", "sans-serif"]
-          },
-          borderRadius: {
-            "DEFAULT": "0.25rem",
-            "lg": "0.5rem",
-            "xl": "0.75rem",
-            "full": "9999px"
-          },
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#4A90E2",
+                    "background-light": "#F5F7FA",
+                    "background-dark": "#101922",
+                    "success": "#50E3C2",
+                    "danger": "#D0021B",
+                    "text-primary": "#4A4A4A",
+                    "text-secondary": "#9B9B9B"
+                },
+                fontFamily: {
+                    "display": ["Inter", "sans-serif"]
+                },
+                borderRadius: {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+            },
         },
-      },
     }
 </script>
 <style>
@@ -45,40 +42,6 @@
 <body class="bg-background-light dark:bg-background-dark font-display text-text-primary">
 <div class="relative flex h-screen w-full flex-col group/design-root overflow-hidden">
 <div class="layout-container flex h-full grow">
-<div class="flex h-full">
-<div class="flex h-full min-h-[700px] flex-col justify-between bg-white dark:bg-background-dark p-4 border-r border-gray-200 dark:border-gray-700">
-<div class="flex flex-col gap-4">
-<div class="flex items-center gap-3">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJtxgZEea6qWskztE5fq0sRzT76xBz0tFSyC_mzkGzyqH7wmHD15pWeUbHv0GKQ6FTCwar2sx8fn8-HZDfA9FoTQ4JhaCPhQR2ROtCeJtm781uPPz1acQohGR0rWrq9uV6PckocvgB1-wmn4LU-EGG6Ua4nXDhs4DX-4Uscv6qu0zSaroHCvjh8dmOn-51Ixh4Pj1CjEm3pG26q54-2PPK8jBuch6DXnLyY9YH2C69ARTHtK68Awv-dxlNTdK9EWDzR134WyvLANco");'></div>
-<div class="flex flex-col">
-<h1 class="text-text-primary dark:text-white text-base font-medium leading-normal">Admin</h1>
-<p class="text-text-secondary text-sm font-normal leading-normal">admin@example.com</p>
-</div>
-</div>
-<div class="flex flex-col gap-2">
-<a class="flex items-center gap-3 px-3 py-2 text-text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
-<span class="material-symbols-outlined">shopping_cart</span>
-<p class="text-sm font-medium">Compras</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
-<span class="material-symbols-outlined">receipt_long</span>
-<p class="text-sm font-medium">Ventas</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
-<span class="material-symbols-outlined">inventory</span>
-<p class="text-sm font-medium">Inventario</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
-<p class="text-sm font-medium">Proveedores</p>
-</a>
-</div>
-</div>
-<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
-<span class="truncate">Cerrar sesión</span>
-</button>
-</div>
-</div>
 <div class="flex flex-1">
 <aside class="w-1/3 flex flex-col bg-white dark:bg-background-dark border-r border-gray-200 dark:border-gray-700 p-4">
 <div class="flex flex-col gap-4 h-full">
@@ -196,4 +159,5 @@
 </div>
 </div>
 </div>
+
 </body></html>

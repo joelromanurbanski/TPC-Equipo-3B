@@ -13,7 +13,7 @@ namespace SQL
         {
             List<Articulo> lista = new List<Articulo>();
             AccesoDatos datos = new AccesoDatos();
-            ImagenSQL imagenSQL = new ImagenSQL(); // ← nuevo
+            ImagenSQL imagenSQL = new ImagenSQL();
 
             try
             {
