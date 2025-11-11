@@ -16,7 +16,7 @@ namespace SQL
 
             try
             {
-                datos.setearConsulta("SELECT Id, IdArticulo, ImagenUrl FROM IMAGENES WHERE IdArticulo = @IdArticulo");
+                datos.setearConsulta("SELECT Id, IdArticulo, UrlImagen FROM Imagen WHERE IdArticulo = @IdArticulo");
                 datos.setearParametro("@IdArticulo", idArticulo);
                 datos.ejecutarLectura();
 
@@ -26,7 +26,7 @@ namespace SQL
                     {
                         Id = (int)datos.Lector["Id"],
                         IdArticulo = (int)datos.Lector["IdArticulo"],
-                        UrlImagen = datos.Lector["ImagenUrl"].ToString()
+                        UrlImagen = datos.Lector["UrlImagen"].ToString()
                     };
                     lista.Add(img);
                 }
@@ -49,30 +49,9 @@ namespace SQL
 
             try
             {
-                datos.setearConsulta("INSERT INTO IMAGENES (IdArticulo, ImagenUrl) VALUES (@IdArticulo, @Url)");
+                datos.setearConsulta("INSERT INTO Imagen (IdArticulo, UrlImagen) VALUES (@IdArticulo, @Url)");
                 datos.setearParametro("@IdArticulo", idArticulo);
                 datos.setearParametro("@Url", imagen.UrlImagen);
-                datos.ejecutarAccion();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
-        }
-
-        public void Modificar(Imagen imagen)
-        {
-            AccesoDatos datos = new AccesoDatos();
-
-            try
-            {
-                datos.setearConsulta("UPDATE IMAGENES SET ImagenUrl = @Url WHERE Id = @Id");
-                datos.setearParametro("@Url", imagen.UrlImagen);
-                datos.setearParametro("@Id", imagen.Id);
                 datos.ejecutarAccion();
             }
             catch (Exception ex)
@@ -90,7 +69,7 @@ namespace SQL
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("DELETE FROM IMAGENES WHERE IdArticulo = @IdArticulo");
+                datos.setearConsulta("DELETE FROM Imagen WHERE IdArticulo = @IdArticulo");
                 datos.setearParametro("@IdArticulo", idArticulo);
                 datos.ejecutarAccion();
             }
@@ -103,28 +82,5 @@ namespace SQL
                 datos.cerrarConexion();
             }
         }
-
-        public void EliminarPorUrl(string url, int idArticulo)
-        {
-            AccesoDatos datos = new AccesoDatos();
-            try
-            {
-                datos.setearConsulta("DELETE FROM IMAGENES WHERE ImagenUrl = @url AND IdArticulo = @idArticulo");
-                datos.setearParametro("@url", url);
-                datos.setearParametro("@idArticulo", idArticulo);
-                datos.ejecutarAccion();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
-        }
-
     }
-
-
 }

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Dominio;
 
-
 namespace SQL
 {
     public class MarcaSQL
@@ -17,7 +16,7 @@ namespace SQL
 
             try
             {
-                datos.setearConsulta("SELECT Id, Descripcion FROM MARCAS");
+                datos.setearConsulta("SELECT Id, Descripcion FROM Marca");
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())

@@ -7,7 +7,6 @@ using System.Data;
 using System.Data.SqlClient;
 using Dominio;
 
-
 namespace SQL
 {
     public class AccesoDatos
@@ -15,20 +14,61 @@ namespace SQL
         private SqlConnection conexion;
         private SqlCommand comando;
         private SqlDataReader lector;
+        private SqlTransaction transaccion; // Variable para la transacción
 
         public SqlDataReader Lector => lector;
 
         public AccesoDatos()
         {
-            conexion = new SqlConnection("server=.\\SQLEXPRESS; database=CATALOGO_P3_DB; integrated security=true");
+            conexion = new SqlConnection("server=.\\SQLEXPRESS; database=GestionNegocio; integrated security=true");
             comando = new SqlCommand();
         }
+
+        // --- Métodos de Transacción ---
+        public void iniciarTransaccion()
+        {
+            try
+            {
+                if (conexion.State != ConnectionState.Open)
+                    conexion.Open();
+                transaccion = conexion.BeginTransaction();
+                comando.Transaction = transaccion;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al iniciar la transacción.", ex);
+            }
+        }
+
+        public void commitTransaccion()
+        {
+            transaccion?.Commit();
+        }
+
+        public void rollbackTransaccion()
+        {
+            transaccion?.Rollback();
+        }
+
+        // --- Cierre especial para transacciones ---
+        public void cerrarConexionTransaccional()
+        {
+            lector?.Close();
+            transaccion = null; // Limpiar la transacción
+            if (conexion.State != System.Data.ConnectionState.Closed)
+                conexion.Close();
+        }
+
+        // --- Métodos de Acceso a Datos (Modificados) ---
 
         public void setearConsulta(string consulta)
         {
             comando.CommandType = System.Data.CommandType.Text;
             comando.CommandText = consulta;
             comando.Parameters.Clear();
+            comando.Connection = conexion;
+            if (transaccion != null)
+                comando.Transaction = transaccion; // Asignar transacción si existe
         }
 
         public void setearParametro(string nombre, object valor)
@@ -41,7 +81,8 @@ namespace SQL
             comando.Connection = conexion;
             try
             {
-                conexion.Open();
+                if (transaccion == null && conexion.State != ConnectionState.Open)
+                    conexion.Open();
                 lector = comando.ExecuteReader();
             }
             catch (Exception ex)
@@ -55,7 +96,8 @@ namespace SQL
             comando.Connection = conexion;
             try
             {
-                conexion.Open();
+                if (transaccion == null && conexion.State != ConnectionState.Open)
+                    conexion.Open();
                 comando.ExecuteNonQuery();
             }
             catch (Exception ex)
@@ -69,7 +111,8 @@ namespace SQL
             comando.Connection = conexion;
             try
             {
-                conexion.Open();
+                if (transaccion == null && conexion.State != ConnectionState.Open)
+                    conexion.Open();
                 return comando.ExecuteScalar();
             }
             catch (Exception ex)
@@ -87,7 +130,8 @@ namespace SQL
             catch { }
             finally
             {
-                if (conexion.State != System.Data.ConnectionState.Closed)
+                // No cerrar la conexión si estamos en una transacción
+                if (transaccion == null && conexion.State != System.Data.ConnectionState.Closed)
                     conexion.Close();
             }
         }

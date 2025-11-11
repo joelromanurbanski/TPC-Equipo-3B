@@ -13,34 +13,25 @@ namespace SQL
         {
             List<Proveedor> lista = new List<Proveedor>();
             AccesoDatos datos = new AccesoDatos();
-
             try
             {
-                datos.setearConsulta("SELECT Id, Nombre, Email, Telefono, Direccion FROM PROVEEDORES");
+                datos.setearConsulta("SELECT Id, Nombre, Email, Telefono, Direccion FROM Proveedor");
                 datos.ejecutarLectura();
-
                 while (datos.Lector.Read())
                 {
                     lista.Add(new Proveedor
                     {
                         Id = (int)datos.Lector["Id"],
                         Nombre = datos.Lector["Nombre"].ToString(),
-                        Email = datos.Lector["Email"].ToString(),
-                        Telefono = datos.Lector["Telefono"].ToString(),
-                        Direccion = datos.Lector["Direccion"].ToString()
+                        Email = datos.Lector["Email"]?.ToString(),
+                        Telefono = datos.Lector["Telefono"]?.ToString(),
+                        Direccion = datos.Lector["Direccion"]?.ToString()
                     });
                 }
-
                 return lista;
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
         }
 
         public void Agregar(Proveedor proveedor)

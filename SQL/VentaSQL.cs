@@ -15,6 +15,8 @@ namespace SQL
 
             try
             {
+                datos.iniciarTransaccion();
+
                 datos.setearConsulta("INSERT INTO VENTAS (Fecha, IdCliente, NumeroFactura) OUTPUT INSERTED.Id VALUES (@Fecha, @IdCliente, @NumeroFactura)");
                 datos.setearParametro("@Fecha", venta.Fecha);
                 datos.setearParametro("@IdCliente", venta.Cliente.Id);
@@ -32,20 +34,22 @@ namespace SQL
                     datos.setearParametro("@Subtotal", detalle.Subtotal);
                     datos.ejecutarAccion();
 
-                    // Descontar stock
                     datos.setearConsulta("UPDATE ARTICULOS SET StockActual = StockActual - @Cantidad WHERE Id = @IdArticulo");
                     datos.setearParametro("@Cantidad", detalle.Cantidad);
                     datos.setearParametro("@IdArticulo", detalle.Articulo.Id);
                     datos.ejecutarAccion();
                 }
+
+                datos.commitTransaccion();
             }
             catch (Exception ex)
             {
+                datos.rollbackTransaccion();
                 throw ex;
             }
             finally
             {
-                datos.cerrarConexion();
+                datos.cerrarConexionTransaccional();
             }
         }
 

@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace tp_c_equipo_3B
 {
-    public partial class SiteMaster : System.Web.UI.MasterPage
+    public partial class SiteMaster : MasterPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -16,11 +16,8 @@ namespace tp_c_equipo_3B
                 if (Session["Usuario"] != null)
                     lblUsuario.Text = "Bienvenido, " + Session["Usuario"].ToString();
 
-                if (Session["Rol"]?.ToString() != "Admin")
+                if (Session["Rol"]?.ToString() != "Admin" && linkUsuarios != null)
                     linkUsuarios.Visible = false;
-
-                if (Page.AppRelativeVirtualPath == "~/PaneldeControl.aspx")
-                    linkVolver.Visible = false;
             }
         }
 
@@ -28,6 +25,16 @@ namespace tp_c_equipo_3B
         {
             Session.Clear();
             Response.Redirect("~/InicioSesion.aspx");
+        }
+
+        protected void btnGenerar_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Generador.aspx");
+        }
+
+        protected void btnContinue_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/SiguientePaso.aspx");
         }
     }
 }

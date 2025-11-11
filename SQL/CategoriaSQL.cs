@@ -16,7 +16,7 @@ namespace SQL
 
             try
             {
-                datos.setearConsulta("SELECT Id, Descripcion FROM CATEGORIAS");
+                datos.setearConsulta("SELECT Id, Descripcion FROM Categoria");
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())
