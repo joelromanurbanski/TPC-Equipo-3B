@@ -1,274 +1,246 @@
-﻿<%@ Page Title="Registrar Venta" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeBehind="RegistroVenta.aspx.cs" Inherits="tp_c_equipo_3B.RegistroVenta" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RegistroVenta.aspx.cs" Inherits="tp_c_equipo_3B.RegistroVenta" %>
 
-<asp:Content ID="HeadContent" ContentPlaceHolderID="head" runat="server">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <style>
-        
-        :root {
-            --bs-primary: #1173d4; 
-            --bs-danger: #DC3545; 
-            --bs-warning: #FFC107; 
-            --bs-background-light: #f6f7f8; 
-        }
-        
-       
-        .bg-background-light { background-color: var(--bs-background-light) !important; }
-        .text-primary { color: var(--bs-primary) !important; }
-        .bg-primary-light { background-color: rgba(17, 115, 212, 0.1); } 
-        .hover-bg-primary-light:hover { background-color: rgba(17, 115, 212, 0.2) !important; } 
-        
-       
-        .form-control, .form-select { border-radius: 0.5rem; height: 3.5rem; }
-        .btn { border-radius: 0.5rem; }
-
-     
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-
-      
-        .input-warning-icon { 
-            position: absolute; 
-            right: -1.5rem; 
-            top: 50%; 
-            transform: translateY(-50%); 
-            color: var(--bs-warning);
-        }
-    </style>
-</asp:Content>
-
-<asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
-    <div class="py-4 py-lg-5 bg-background-light min-vh-100">
-        <div class="container-fluid max-w-7xl mx-auto">
-            
-            <header class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
-                <h1 class="text-dark fw-bolder mb-0" style="font-size: 2.5rem;">Registrar Nueva Venta</h1>
-                
-                <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" 
-                    CssClass="btn btn-secondary fw-bold" style="height: 2.5rem; min-width: 84px;" />
-            </header>
-            
-            <div class="row g-4 g-lg-5">
-                <div class="col-lg-8 space-y-5">
-                    
-                    <section class="card shadow-sm border-0 rounded-xl">
-                        <div class="card-body p-4 p-md-5">
-                            <h2 class="h4 fw-bold text-dark mb-4">Cliente</h2>
-                            <div class="d-flex align-items-start gap-3">
-                                <div class="flex-grow-1">
-                                    <label class="form-label sr-only" for="customer-search">Buscar por nombre o DNI...</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text border-end-0 bg-white" style="height: 3.5rem;">
-                                            <span class="material-symbols-outlined text-muted">search</span>
-                                        </span>
-                                        <asp:TextBox ID="txtBuscarCliente" runat="server" CssClass="form-control border-start-0" 
-                                            Placeholder="Buscar por nombre o DNI..." />
-                                    </div>
-                                </div>
-                                <button class="flex-shrink-0 btn bg-primary-light hover-bg-primary-light text-primary d-flex align-items-center justify-content-center" 
-                                    type="button" style="width: 3.5rem; height: 3.5rem;">
-                                    <span class="material-symbols-outlined fs-4">add</span>
-                                </button>
-                            </div>
-
-                            <div class="mt-4 p-3 border border-dashed border-secondary rounded-lg d-none" id="customer-details">
-                                <h3 class="fw-semibold text-dark">Datos del Cliente</h3>
-                                <div class="row g-2 mt-2 small">
-                                    <div class="col-12 col-sm-4">
-                                        <span class="fw-medium text-muted">Nombre:</span> 
-                                        <span class="text-dark" id="customer-name">Nombre del Cliente</span>
-                                    </div>
-                                    <div class="col-12 col-sm-4">
-                                        <span class="fw-medium text-muted">DNI/RUC:</span> 
-                                        <span class="text-dark" id="customer-id">12345678X</span>
-                                    </div>
-                                    <div class="col-12 col-sm-4">
-                                        <span class="fw-medium text-muted">Teléfono:</span> 
-                                        <span class="text-dark" id="customer-phone">+54 9 11 XXXX-XXXX</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    <section class="card shadow-sm border-0 rounded-xl">
-                        <div class="card-body p-4 p-md-5">
-                            <h2 class="h4 fw-bold text-dark mb-4">Productos</h2>
-                            <div class="d-flex align-items-start gap-3 mb-4">
-                                <div class="flex-grow-1">
-                                    <label class="form-label sr-only" for="product-search">Buscar por nombre o código...</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text border-end-0 bg-white" style="height: 3.5rem;">
-                                            <span class="material-symbols-outlined text-muted">search</span>
-                                        </span>
-                                        <asp:TextBox ID="txtBuscarProducto" runat="server" CssClass="form-control border-start-0" 
-                                            Placeholder="Buscar por nombre o código..." />
-                                    </div>
-                                </div>
-                                <button class="btn bg-primary-light hover-bg-primary-light text-primary fw-bold flex-shrink-0 px-4" 
-                                    type="button" style="height: 3.5rem;">
-                                    Agregar
-                                </button>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0 text-start">
-                                    <thead class="border-bottom border-secondary-subtle small text-uppercase">
-                                        <tr>
-                                            <th class="p-3 fw-semibold text-muted" scope="col">Producto</th>
-                                            <th class="p-3 fw-semibold text-muted text-center" scope="col">Stock</th>
-                                            <th class="p-3 fw-semibold text-muted text-center" scope="col">Cantidad</th>
-                                            <th class="p-3 fw-semibold text-muted text-end" scope="col">Precio Unit.</th>
-                                            <th class="p-3 fw-semibold text-muted text-end" scope="col">Precio Total</th>
-                                            <th class="p-3 fw-semibold text-muted text-center" scope="col">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="border-bottom border-secondary-subtle">
-                                            <td class="p-3 text-dark fw-medium">Laptop Gamer Pro</td>
-                                            <td class="p-3 text-muted text-center">15</td>
-                                            <td class="p-3">
-                                                <input class="form-control text-center mx-auto" type="number" value="1" style="width: 80px; height: 2.5rem;"/>
-                                            </td>
-                                            <td class="p-3 text-dark text-end">$1200.00</td>
-                                            <td class="p-3 text-dark fw-bold text-end">$1200.00</td>
-                                            <td class="p-3 text-center">
-                                                <button class="btn btn-link p-0 text-danger" type="button">
-                                                    <span class="material-symbols-outlined small">delete</span>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr class="border-bottom border-secondary-subtle">
-                                            <td class="p-3 text-dark fw-medium">Mouse Inalámbrico</td>
-                                            <td class="p-3 text-center">
-                                                <span class="text-danger fw-bold">5</span>
-                                            </td>
-                                            <td class="p-3">
-                                                <div class="position-relative d-inline-block">
-                                                    <input class="form-control text-center mx-auto border-danger" type="number" value="6" style="width: 80px; height: 2.5rem;"/>
-                                                    <span class="material-symbols-outlined small input-warning-icon" title="Stock insuficiente">warning</span>
-                                                </div>
-                                            </td>
-                                            <td class="p-3 text-dark text-end">$25.50</td>
-                                            <td class="p-3 text-dark fw-bold text-end">$153.00</td>
-                                            <td class="p-3 text-center">
-                                                <button class="btn btn-link p-0 text-danger" type="button">
-                                                    <span class="material-symbols-outlined small">delete</span>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="col-lg-4 space-y-5">
-                    <div class="sticky-top" style="top: 2rem;">
-                        
-                        <section class="card shadow-sm border-0 rounded-xl mb-4">
-                            <div class="card-body p-4 p-md-5">
-                                <h2 class="h4 fw-bold text-dark mb-4">Resumen de Venta</h2>
-                                <div class="d-flex flex-column gap-3">
-                                    <div class="d-flex justify-content-between text-muted">
-                                        <span>Subtotal</span>
-                                        <span class="fw-semibold text-dark">$1353.00</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center text-muted">
-                                        <span>Descuento (%)</span>
-                                        <input class="form-control text-end" type="number" value="0" style="width: 80px; height: 2.5rem;"/>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center text-muted">
-                                        <span>IVA (%)</span>
-                                        <input class="form-control text-end" type="number" value="21" style="width: 80px; height: 2.5rem;"/>
-                                    </div>
-                                    
-                                    <div class="border-top border-secondary-subtle my-3"></div>
-
-                                    <div class="d-flex justify-content-between h5 fw-bold text-dark mb-0">
-                                        <span>TOTAL</span>
-                                        <span style="font-size: 1.5rem;">$1637.13</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-4">
-                                    <label class="form-label fw-semibold text-dark" for="payment-method">Método de Pago</label>
-                                    <asp:DropDownList ID="ddlMetodoPago" runat="server" CssClass="form-select mt-2" style="height: 3.5rem;">
-                                        <asp:ListItem Text="Efectivo" Value="Efectivo" />
-                                        <asp:ListItem Text="Tarjeta de Crédito" Value="Tarjeta" />
-                                        <asp:ListItem Text="Transferencia Bancaria" Value="Transferencia" />
-                                    </asp:DropDownList>
-                                </div>
-                                
-                                <div class="mt-4 d-grid gap-3">
-                                    <asp:Button ID="btnGenerarVenta" runat="server" Text="Generar Venta y Factura" 
-                                        CssClass="btn btn-primary fw-bold" style="height: 3rem;" />
-                                    <asp:Button ID="btnGuardarBorrador" runat="server" Text="Guardar Borrador" 
-                                        CssClass="btn btn-secondary fw-bold" style="height: 3rem;" />
-                                </div>
-                            </div>
-                        </section>
-
-                        <section class="card shadow-sm border-0 rounded-xl">
-                            <div class="card-body p-4">
-                                <h3 class="h6 fw-bold text-dark mb-4">Vista Previa de Factura</h3>
-                                <div class="border border-secondary-subtle rounded-lg p-4 bg-white" style="aspect-ratio: 210 / 297; font-size: 0.75rem;">
-                                    <div class="d-flex justify-content-between align-items-start pb-3 border-bottom border-secondary-subtle">
-                                        <div>
-                                            <h4 class="fw-bold fs-6">Mi Negocio</h4>
-                                            <p class="mb-0">Calle Falsa 123</p>
-                                            <p class="mb-0">Ciudad, País</p>
-                                        </div>
-                                        <div class="text-end">
-                                            <h4 class="fw-bold fs-6">FACTURA</h4>
-                                            <p class="mb-0">#FAC-00123</p>
-                                            <p class="mb-0">Fecha: 24/07/2024</p>
-                                        </div>
-                                    </div>
-                                    <div class="py-3 border-bottom border-secondary-subtle">
-                                        <h4 class="fw-bold mb-1">Cliente:</h4>
-                                        <p class="mb-0">Nombre del Cliente</p>
-                                        <p class="mb-0">DNI: 12345678X</p>
-                                    </div>
-                                    <div class="flex-grow-1 py-3">
-                                        <table class="w-100">
-                                            <thead>
-                                                <tr class="border-bottom border-secondary-subtle">
-                                                    <th class="text-start py-1">Item</th>
-                                                    <th class="text-center py-1">Cant.</th>
-                                                    <th class="text-end py-1">P. Unit</th>
-                                                    <th class="text-end py-1">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="py-1">Laptop Gamer Pro</td>
-                                                    <td class="text-center py-1">1</td>
-                                                    <td class="text-end py-1">$1200.00</td>
-                                                    <td class="text-end py-1">$1200.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="py-1">Mouse Inalámbrico</td>
-                                                    <td class="text-center py-1">6</td>
-                                                    <td class="text-end py-1">$25.50</td>
-                                                    <td class="text-end py-1">$153.00</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="pt-3 border-top border-secondary-subtle text-end">
-                                        <p class="mb-0">Subtotal: <span class="fw-semibold">$1353.00</span></p>
-                                        <p class="mb-0">IVA (21%): <span class="fw-semibold">$284.13</span></p>
-                                        <p class="fw-bold fs-6 mt-2">TOTAL: <span class="fw-bold">$1637.13</span></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</asp:Content>
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale-1.0" name="viewport"/>
+<title>Registrar Nueva Venta</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#1173d4",
+                    "background-light": "#f6f7f8",
+                    "background-dark": "#101922",
+                    "danger": "#DC3545",
+                    "warning": "#FFC107",
+                },
+                fontFamily: {
+                    "display": ["Inter", "sans-serif"]
+                },
+                borderRadius: {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+            },
+        },
+    }
+</script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="min-h-screen">
+<main class="p-6 lg:p-8">
+<div class="max-w-7xl mx-auto">
+<header class="flex flex-wrap justify-between items-center gap-4 mb-8">
+<h1 class="text-4xl font-black tracking-tight text-gray-800 dark:text-white">Registrar Nueva Venta</h1>
+<button class="flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold">
+<span class="truncate">Cancelar</span>
+</button>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-8">
+<section class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm">
+<h2 class="text-2xl font-bold tracking-tight text-gray-800 dark:text-white mb-4">Cliente</h2>
+<div class="flex items-start gap-4">
+<div class="flex-1">
+<label class="text-base font-medium text-gray-800 dark:text-gray-300 sr-only" for="customer-search">Buscar por nombre o DNI...</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+<input class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 h-14 pl-10 text-gray-800 dark:text-gray-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-primary focus:border-primary" id="customer-search" placeholder="Buscar por nombre o DNI..." type="text"/>
+</div>
+</div>
+<button class="flex-shrink-0 size-14 flex items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<div class="mt-4 p-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg hidden" id="customer-details">
+<h3 class="font-semibold text-gray-800 dark:text-white">Datos del Cliente</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2 text-sm">
+<div><span class="font-medium text-gray-500 dark:text-gray-400">Nombre:</span> <span class="text-gray-800 dark:text-gray-200" id="customer-name"></span></div>
+<div><span class="font-medium text-gray-500 dark:text-gray-400">DNI/RUC:</span> <span class="text-gray-800 dark:text-gray-200" id="customer-id"></span></div>
+<div><span class="font-medium text-gray-500 dark:text-gray-400">Teléfono:</span> <span class="text-gray-800 dark:text-gray-200" id="customer-phone"></span></div>
+</div>
+</div>
+</section>
+<section class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm">
+<h2 class="text-2xl font-bold tracking-tight text-gray-800 dark:text-white mb-4">Productos</h2>
+<div class="flex items-start gap-4 mb-6">
+<div class="flex-1">
+<label class="text-base font-medium text-gray-800 dark:text-gray-300 sr-only" for="product-search">Buscar por nombre o código...</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+<input class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 h-14 pl-10 text-gray-800 dark:text-gray-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-primary focus:border-primary" id="product-search" placeholder="Buscar por nombre o código..." type="text"/>
+</div>
+</div>
+<button class="flex-shrink-0 h-14 px-6 flex items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-sm font-bold">
+                Agregar
+              </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="border-b border-gray-200 dark:border-gray-700">
+<tr>
+<th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400">Producto</th>
+<th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400 text-center">Stock</th>
+<th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400 text-center">Cantidad</th>
+<th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400 text-right">Precio Unit.</th>
+<th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400 text-right">Precio Total</th>
+<th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400 text-center">Acciones</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<td class="p-3 text-gray-800 dark:text-gray-200 font-medium">Laptop Gamer Pro</td>
+<td class="p-3 text-gray-500 dark:text-gray-400 text-center">15</td>
+<td class="p-3">
+<input class="form-input w-20 text-center rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 h-10 text-gray-800 dark:text-gray-200 focus:ring-primary focus:border-primary" type="number" value="1"/>
+</td>
+<td class="p-3 text-gray-800 dark:text-gray-200 text-right">$1200.00</td>
+<td class="p-3 text-gray-800 dark:text-gray-200 font-bold text-right">$1200.00</td>
+<td class="p-3 text-center">
+<button class="text-danger hover:text-danger/80">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<td class="p-3 text-gray-800 dark:text-gray-200 font-medium">Mouse Inalámbrico</td>
+<td class="p-3 text-center">
+<span class="text-danger font-bold">5</span>
+</td>
+<td class="p-3">
+<div class="relative">
+<input class="form-input w-20 text-center rounded-lg border-danger dark:border-danger bg-white dark:bg-gray-800 h-10 text-gray-800 dark:text-gray-200 focus:ring-danger focus:border-danger" type="number" value="6"/>
+<span class="material-symbols-outlined text-warning absolute -right-6 top-1/2 -translate-y-1/2" title="Stock insuficiente">warning</span>
+</div>
+</td>
+<td class="p-3 text-gray-800 dark:text-gray-200 text-right">$25.50</td>
+<td class="p-3 text-gray-800 dark:text-gray-200 font-bold text-right">$153.00</td>
+<td class="p-3 text-center">
+<button class="text-danger hover:text-danger/80">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<div class="lg:col-span-1 space-y-8">
+<div class="sticky top-8">
+<section class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm">
+<h2 class="text-2xl font-bold tracking-tight text-gray-800 dark:text-white mb-6">Resumen de Venta</h2>
+<div class="space-y-4">
+<div class="flex justify-between text-gray-600 dark:text-gray-300">
+<span>Subtotal</span>
+<span class="font-medium text-gray-800 dark:text-gray-200">$1353.00</span>
+</div>
+<div class="flex justify-between items-center text-gray-600 dark:text-gray-300">
+<span>Descuento (%)</span>
+<input class="form-input w-20 text-right rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 h-10 text-gray-800 dark:text-gray-200 focus:ring-primary focus:border-primary" type="number" value="0"/>
+</div>
+<div class="flex justify-between items-center text-gray-600 dark:text-gray-300">
+<span>IVA (%)</span>
+<input class="form-input w-20 text-right rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 h-10 text-gray-800 dark:text-gray-200 focus:ring-primary focus:border-primary" type="number" value="21"/>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+<div class="flex justify-between text-2xl font-bold text-gray-900 dark:text-white">
+<span>TOTAL</span>
+<span>$1637.13</span>
+</div>
+</div>
+<div class="mt-6">
+<label class="text-base font-medium text-gray-800 dark:text-gray-300" for="payment-method">Método de Pago</label>
+<select class="form-select mt-2 w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 h-14 text-gray-800 dark:text-gray-200 focus:ring-primary focus:border-primary" id="payment-method">
+<option>Efectivo</option>
+<option>Tarjeta de Crédito</option>
+<option>Transferencia Bancaria</option>
+</select>
+</div>
+<div class="mt-8 space-y-3">
+<button class="w-full flex items-center justify-center rounded-lg h-12 px-6 bg-primary text-white text-base font-bold">
+                  Generar Venta y Factura
+                </button>
+<button class="w-full flex items-center justify-center rounded-lg h-12 px-6 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-base font-bold">
+                  Guardar Borrador
+                </button>
+</div>
+</section>
+<section class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm mt-8">
+<h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Vista Previa de Factura</h3>
+<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4 aspect-[210/297] flex flex-col text-xs text-gray-700 dark:text-gray-300">
+<div class="flex justify-between items-start pb-4 border-b border-gray-200 dark:border-gray-700">
+<div>
+<h4 class="font-bold text-base">Mi Negocio</h4>
+<p>Calle Falsa 123</p>
+<p>Ciudad, País</p>
+</div>
+<div class="text-right">
+<h4 class="font-bold text-base">FACTURA</h4>
+<p>#FAC-00123</p>
+<p>Fecha: 24/07/2024</p>
+</div>
+</div>
+<div class="py-4 border-b border-gray-200 dark:border-gray-700">
+<h4 class="font-bold">Cliente:</h4>
+<p>Nombre del Cliente</p>
+<p>DNI: 12345678X</p>
+</div>
+<div class="flex-1 py-4">
+<table class="w-full">
+<thead>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<th class="text-left py-1">Item</th>
+<th class="text-center py-1">Cant.</th>
+<th class="text-right py-1">P. Unit</th>
+<th class="text-right py-1">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="py-1">Laptop Gamer Pro</td>
+<td class="text-center py-1">1</td>
+<td class="text-right py-1">$1200.00</td>
+<td class="text-right py-1">$1200.00</td>
+</tr>
+<tr>
+<td class="py-1">Mouse Inalámbrico</td>
+<td class="text-center py-1">6</td>
+<td class="text-right py-1">$25.50</td>
+<td class="text-right py-1">$153.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
+<p>Subtotal: <span class="font-medium">$1353.00</span></p>
+<p>IVA (21%): <span class="font-medium">$284.13</span></p>
+<p class="font-bold text-base mt-2">TOTAL: <span class="font-bold">$1637.13</span></p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</div></main>
+</div>
+</body></html>

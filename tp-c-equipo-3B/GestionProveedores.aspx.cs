@@ -38,7 +38,7 @@ namespace tp_c_equipo_3B
                 ScriptManager.RegisterStartupScript(this, GetType(), "activateTabProveedores", script, true);
             }
         }
-        
+
 
         private void BindSidebar()
         {
@@ -200,20 +200,20 @@ namespace tp_c_equipo_3B
 
 
 
-    public class Proveedor
-    {
-        public string Id { get; set; }
-        public string Nombre { get; set; }
-        public string Telefono { get; set; }
-        public string TaxId { get; set; }
-        public string Address { get; set; }
-        public string Website { get; set; }
-        public string Notes { get; set; }
-    }
+public class Proveedor
+{
+    public string Id { get; set; }
+    public string Nombre { get; set; }
+    public string Telefono { get; set; }
+    public string TaxId { get; set; }
+    public string Address { get; set; }
+    public string Website { get; set; }
+    public string Notes { get; set; }
+}
 
-    public class RankItem
-    {
-        public string Name { get; set; }
-        public int Score { get; set; }
-    }
+public class RankItem
+{
+    public string Name { get; set; }
+    public int Score { get; set; }
+}
 

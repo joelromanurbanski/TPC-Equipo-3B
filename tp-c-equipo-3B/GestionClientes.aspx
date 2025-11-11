@@ -144,8 +144,7 @@
                         <asp:TemplateField HeaderText="Acciones">
                             <ItemTemplate>
                                 <asp:LinkButton ID="lnkEditar" runat="server" CommandName="Editar" CommandArgument='<%# Eval("Id") %>' CssClass="me-2">Editar</asp:LinkButton>
-                                <asp:LinkButton ID="lnkEliminar" runat="server" CommandName="Eliminar" CommandArgument='<%# Eval("Id") %>' CssClass="text-danger">Eliminar</asp:LinkButton>
-                            </ItemTemplate>
+                                <asp:LinkButton ID="lnkEliminar" runat="server" CommandName="Eliminar" CommandArgument='<%# Eval("Id") %>' CssClass="text-danger">Eliminar</asp:LinkButton> </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
                 </asp:GridView>

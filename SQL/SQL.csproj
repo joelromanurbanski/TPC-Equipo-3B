@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccesoDatos.cs" />
-    <Compile Include="ArticuloProveedorSQL.cs" />
     <Compile Include="ArticuloSQL.cs" />
     <Compile Include="CategoriaSQL.cs" />
     <Compile Include="ClienteSQL.cs" />
