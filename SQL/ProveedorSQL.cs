@@ -40,7 +40,8 @@ namespace SQL
 
             try
             {
-                datos.setearConsulta("INSERT INTO PROVEEDORES (Nombre, Email, Telefono, Direccion) VALUES (@Nombre, @Email, @Telefono, @Direccion)");
+                 
+                datos.setearConsulta("INSERT INTO Proveedor (Nombre, Email, Telefono, Direccion) VALUES (@Nombre, @Email, @Telefono, @Direccion)");
                 datos.setearParametro("@Nombre", proveedor.Nombre);
                 datos.setearParametro("@Email", proveedor.Email);
                 datos.setearParametro("@Telefono", proveedor.Telefono);
@@ -55,6 +56,40 @@ namespace SQL
             {
                 datos.cerrarConexion();
             }
+        }
+
+        public void Modificar(Proveedor proveedor)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearConsulta("UPDATE Proveedor SET Nombre=@Nombre, Email=@Email, Telefono=@Telefono, Direccion=@Direccion WHERE Id=@Id");
+                datos.setearParametro("@Id", proveedor.Id);
+                datos.setearParametro("@Nombre", proveedor.Nombre);
+                datos.setearParametro("@Email", proveedor.Email);
+                datos.setearParametro("@Telefono", proveedor.Telefono);
+                datos.setearParametro("@Direccion", proveedor.Direccion);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
+        }
+
+        public void Eliminar(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                 datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdProveedor = @Id");
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+
+                 datos.setearConsulta("DELETE FROM Proveedor WHERE Id = @Id");
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
         }
     }
 }

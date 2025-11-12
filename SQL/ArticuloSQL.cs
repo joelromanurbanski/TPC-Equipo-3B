@@ -13,7 +13,7 @@ namespace SQL
         {
             List<Articulo> lista = new List<Articulo>();
             AccesoDatos datos = new AccesoDatos();
-            ImagenSQL imagenSQL = new ImagenSQL(); 
+            ImagenSQL imagenSQL = new ImagenSQL();
 
             try
             {
@@ -71,7 +71,6 @@ namespace SQL
             AccesoDatos datos = new AccesoDatos();
             try
             {
-
                 datos.setearConsulta(@"INSERT INTO Articulo 
                                      (Codigo, Nombre, Descripcion, IdMarca, IdCategoria, 
                                       PorcentajeGanancia, StockMinimo, StockActual, UltimoPrecioCompra, UrlImagen) 
@@ -101,7 +100,6 @@ namespace SQL
             AccesoDatos datos = new AccesoDatos();
             try
             {
-
                 datos.setearConsulta(@"UPDATE Articulo SET Codigo=@Codigo, Nombre=@Nombre, 
                                        Descripcion=@Descripcion, IdMarca=@IdMarca, 
                                        IdCategoria=@IdCategoria, UrlImagen=@UrlImagen,
@@ -137,6 +135,56 @@ namespace SQL
                 datos.setearConsulta("DELETE FROM Articulo WHERE Id = @Id");
                 datos.setearParametro("@Id", id);
                 datos.ejecutarAccion();
+            }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
+        }
+
+      
+        public List<Articulo> ListarPorProveedor(int idProveedor)
+        {
+            List<Articulo> lista = new List<Articulo>();
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                
+                datos.setearConsulta(@"
+                SELECT A.Id, Codigo, Nombre, A.Descripcion, 
+                       A.UltimoPrecioCompra, A.PorcentajeGanancia, 
+                       A.StockActual, A.StockMinimo,
+                       A.IdMarca, A.IdCategoria, A.UrlImagen,
+                       M.Descripcion Marca, C.Descripcion Categoria
+                FROM Articulo A
+                INNER JOIN ArticuloProveedor AP ON A.Id = AP.IdArticulo
+                LEFT JOIN Marca M ON A.IdMarca = M.Id
+                LEFT JOIN Categoria C ON A.IdCategoria = C.Id
+                WHERE AP.IdProveedor = @IdProveedor");
+
+                datos.setearParametro("@IdProveedor", idProveedor);
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    Articulo art = new Articulo
+                    {
+                        Id = (int)datos.Lector["Id"],
+                        Codigo = datos.Lector["Codigo"].ToString(),
+                        Nombre = datos.Lector["Nombre"].ToString(),
+                        Descripcion = datos.Lector["Descripcion"].ToString(),
+                        UltimoPrecioCompra = datos.Lector["UltimoPrecioCompra"] != DBNull.Value ? (decimal)datos.Lector["UltimoPrecioCompra"] : 0,
+                        PorcentajeGanancia = datos.Lector["PorcentajeGanancia"] != DBNull.Value ? (decimal)datos.Lector["PorcentajeGanancia"] : 0,
+                        StockActual = datos.Lector["StockActual"] != DBNull.Value ? (int)datos.Lector["StockActual"] : 0,
+                        StockMinimo = datos.Lector["StockMinimo"] != DBNull.Value ? (int)datos.Lector["StockMinimo"] : 0,
+                        IdMarca = datos.Lector["IdMarca"] != DBNull.Value ? (int)datos.Lector["IdMarca"] : 0,
+                        IdCategoria = datos.Lector["IdCategoria"] != DBNull.Value ? (int)datos.Lector["IdCategoria"] : 0,
+                        Marca = new Marca { Descripcion = datos.Lector["Marca"].ToString() },
+                        Categoria = new Categoria { Descripcion = datos.Lector["Categoria"].ToString() },
+                        UrlImagen = datos.Lector["UrlImagen"] != DBNull.Value ? datos.Lector["UrlImagen"].ToString() : ""
+                    };
+                    lista.Add(art);
+                }
+                return lista;
             }
             catch (Exception ex) { throw ex; }
             finally { datos.cerrarConexion(); }

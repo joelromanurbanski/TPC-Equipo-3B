@@ -4,202 +4,267 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
-
+using Dominio; 
+using SQL;
 
 namespace tp_c_equipo_3B
 {
     public partial class GestionProveedores : Page
     {
-        private const string SESSION_PROVEEDORES = "ProveedoresList";
-        private const string SESSION_CONTACTOS = "ProveedoresContactos";
-        private const string SESSION_PRODUCTOS = "ProveedoresProductos";
-        private const string SESSION_RANK = "RankDemoList";
+        private ProveedorSQL proveedorSQL = new ProveedorSQL();
+        private ArticuloSQL articuloSQL = new ArticuloSQL();
+
+        private List<Proveedor> ListaProveedores { get; set; }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+            ListaProveedores = proveedorSQL.Listar();
 
-            var tab = Request.QueryString["tab"];
-            if (!string.IsNullOrEmpty(tab))
+            if (!IsPostBack)
             {
-                var script = $"document.addEventListener('DOMContentLoaded', function(){{ var b = document.querySelector('#tabsGestionProveedores #tab-{tab}'); if(b) new bootstrap.Tab(b).show(); }});";
-                ScriptManager.RegisterStartupScript(this, GetType(), "activateTabProveedores", script, true);
+                BindSidebar(ListaProveedores);
+
+                string idSeleccionado = Request.QueryString["id"];
+                if (!string.IsNullOrEmpty(idSeleccionado))
+                {
+                    ShowProveedor(idSeleccionado);
+                }
+                else
+                {
+                    // No hay ID, mostrar panel vacío
+                    pnlVacio.Visible = true;
+                    pnlDetalle.Visible = false;
+                    pnlFormulario.Visible = false;
+                }
             }
         }
-        
 
-        private void BindSidebar()
+        private void BindSidebar(List<Proveedor> lista)
         {
-            var list = (List<Proveedor>)Session[SESSION_PROVEEDORES] ?? new List<Proveedor>();
-            rptProveedores.DataSource = list;
+            rptProveedores.DataSource = lista;
             rptProveedores.DataBind();
 
-            var first = list.FirstOrDefault();
-            if (first != null) ShowProveedor(first);
+            if (lista == null || lista.Count == 0)
+            {
+                pnlEmptyProveedores.Visible = true;
+                rptProveedores.Visible = false;
+            }
+            else
+            {
+                pnlEmptyProveedores.Visible = false;
+                rptProveedores.Visible = true;
+            }
+        }
+
+        private void BindProductos(int idProveedor)
+        {
+            gvProductos.DataSource = articuloSQL.ListarPorProveedor(idProveedor);
+            gvProductos.DataBind();
         }
 
         protected void rptProveedores_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName == "Select")
             {
-                var id = e.CommandArgument.ToString();
-                var list = (List<Proveedor>)Session[SESSION_PROVEEDORES];
-                var p = list.FirstOrDefault(x => x.Id == id);
-                if (p != null) ShowProveedor(p);
+                string id = e.CommandArgument.ToString();
+                Response.Redirect("GestionProveedores.aspx?id=" + id, false);
             }
         }
 
-        private void ShowProveedor(Proveedor p)
+        private void ShowProveedor(string id)
         {
-            lblProveedorNombre.Text = p.Nombre;
-            lblCompanyName.Text = p.Nombre;
-            lblTaxId.Text = p.TaxId;
-            lblAddress.Text = p.Address;
-            lblPhone.Text = p.Telefono;
-            lblWebsite.Text = p.Website;
-            lblNotes.Text = p.Notes;
+            try
+            {
+                int idProveedor = int.Parse(id);
+                Proveedor p = ListaProveedores.FirstOrDefault(x => x.Id == idProveedor);
+
+                if (p != null)
+                {
+                    pnlVacio.Visible = false;
+                    pnlFormulario.Visible = false;
+                    pnlDetalle.Visible = true; // Mostrar detalles
+
+                    ViewState["SelectedProveedorId"] = idProveedor;
+
+                    // Rellenar Pestaña "Datos Generales"
+                    lblProveedorNombre.Text = p.Nombre;
+                    lblCompanyName.Text = p.Nombre;
+                    lblEmail.Text = p.Email ?? "N/A";
+                    lblAddress.Text = p.Direccion ?? "N/A";
+                    lblPhone.Text = p.Telefono ?? "N/A";
+
+                    BindProductos(idProveedor);
+                }
+            }
+            catch (Exception ex)
+            {
+                lblProveedorNombre.Text = "Error al cargar";
+            }
         }
+
+        // --- Eventos de Botones ---
 
         protected void btnBuscarProveedorSidebar_Click(object sender, EventArgs e)
         {
-            var q = Request.Form["txtBuscarProveedorSidebar"] ?? string.Empty;
-            var list = (List<Proveedor>)Session[SESSION_PROVEEDORES] ?? new List<Proveedor>();
-            var filtered = list.Where(x => x.Nombre.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
-            rptProveedores.DataSource = filtered;
-            rptProveedores.DataBind();
+            string q = txtBuscarProveedorSidebar.Text.Trim();
+            var filtered = ListaProveedores.Where(x => x.Nombre.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            BindSidebar(filtered);
         }
 
         protected void btnGlobalSearch_Click(object sender, EventArgs e)
         {
-            var q = Request.Form["txtGlobalSearch"] ?? string.Empty;
-           
-            var list = (List<Proveedor>)Session[SESSION_PROVEEDORES] ?? new List<Proveedor>();
-            var filtered = list.Where(x => x.Nombre.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
-            rptProveedores.DataSource = filtered;
-            rptProveedores.DataBind();
-        }
+            string q = txtGlobalSearch.Text.Trim();
+            var filtered = ListaProveedores.Where(x => x.Nombre.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            BindSidebar(filtered);
 
-        protected void btnExportar_Click(object sender, EventArgs e)
-        {
-            var list = (List<Proveedor>)Session[SESSION_PROVEEDORES];
-            if (list == null || !list.Any()) return;
-            var csv = "Nombre,Telefono,TaxId,Address,Website,Notes\r\n" +
-                      string.Join("\r\n", list.Select(c => $"{EscapeCsv(c.Nombre)},{EscapeCsv(c.Telefono)},{EscapeCsv(c.TaxId)},{EscapeCsv(c.Address)},{EscapeCsv(c.Website)},{EscapeCsv(c.Notes)}"));
-            Response.Clear();
-            Response.ContentType = "text/csv";
-            Response.AddHeader("content-disposition", "attachment;filename=proveedores.csv");
-            Response.Write(csv);
-            Response.End();
-        }
-
-        protected void btnImportar_Click(object sender, EventArgs e)
-        {
-            
+            if (filtered.Count == 1)
+            {
+                Response.Redirect("GestionProveedores.aspx?id=" + filtered[0].Id, false);
+            }
         }
 
         protected void btnRefrescar_Click(object sender, EventArgs e)
         {
-            
-        }
-
-        protected void btnNuevoProveedor_Click(object sender, EventArgs e)
-        {
-            Response.Redirect(Request.Path + "?tab=datos&new=1");
-        }
-
-        protected void btnEditarProveedor_Click(object sender, EventArgs e)
-        {
-            
+            Response.Redirect("GestionProveedores.aspx", false);
         }
 
         protected void btnEliminarProveedor_Click(object sender, EventArgs e)
         {
-            var name = lblCompanyName.Text;
-            var list = (List<Proveedor>)Session[SESSION_PROVEEDORES];
-            var toRemove = list.FirstOrDefault(x => x.Nombre == name);
-            if (toRemove != null)
+            try
             {
-                list.Remove(toRemove);
-                Session[SESSION_PROVEEDORES] = list;
-                BindSidebar();
-            }
-        }
-
-        #region Rank demo
-        private void BindRankDemo()
-        {
-            var list = Session[SESSION_RANK] as List<RankItem>;
-            if (list == null)
-            {
-                list = new List<RankItem>
+                if (ViewState["SelectedProveedorId"] != null)
                 {
-                    new RankItem { Name = "1000 Clash", Score = 1200 },
-                    new RankItem { Name = "Basehead", Score = 1100 },
-                    new RankItem { Name = "casper", Score = 1050 },
-                    new RankItem { Name = "Rank demo", Score = 1000 }
-                };
-                Session[SESSION_RANK] = list;
+                    int id = (int)ViewState["SelectedProveedorId"];
+                    proveedorSQL.Eliminar(id);
+                    Response.Redirect("GestionProveedores.aspx", false);
+                }
             }
-            rptRankDemo.DataSource = list.OrderByDescending(r => r.Score).ToList();
-            rptRankDemo.DataBind();
-        }
-
-        protected void btnJoinRank_Click(object sender, EventArgs e)
-        {
-            var list = Session[SESSION_RANK] as List<RankItem> ?? new List<RankItem>();
-            var me = User?.Identity?.Name ?? "You";
-            if (!list.Any(x => x.Name.Equals(me, StringComparison.OrdinalIgnoreCase)))
+            catch (Exception ex)
             {
-                list.Add(new RankItem { Name = me, Score = 900 });
-                Session[SESSION_RANK] = list;
+                lblProveedorNombre.Text = "Error al eliminar: " + ex.Message;
             }
-            BindRankDemo();
         }
 
-        protected void btnLeaveRank_Click(object sender, EventArgs e)
+        // --- ¡LÓGICA DE FORMULARIO NUEVA! ---
+
+        private void LimpiarFormulario()
         {
-            var list = Session[SESSION_RANK] as List<RankItem>;
-            if (list == null) return;
-            var me = User?.Identity?.Name ?? "You";
-            var existing = list.FirstOrDefault(x => x.Name.Equals(me, StringComparison.OrdinalIgnoreCase));
-            if (existing != null)
+            txtNombreForm.Text = "";
+            txtEmailForm.Text = "";
+            txtTelefonoForm.Text = "";
+            txtDireccionForm.Text = "";
+        }
+
+        protected void btnNuevoProveedor_Click(object sender, EventArgs e)
+        {
+            // Ocultar los otros paneles
+            pnlVacio.Visible = false;
+            pnlDetalle.Visible = false;
+
+            // Mostrar el formulario en modo "Nuevo"
+            pnlFormulario.Visible = true;
+            litTitulo.Text = "Nuevo Proveedor";
+            LimpiarFormulario();
+            btnGuardar.Visible = true;
+            btnModificar.Visible = false;
+        }
+
+        protected void btnEditarProveedor_Click(object sender, EventArgs e)
+        {
+            if (ViewState["SelectedProveedorId"] == null) return;
+
+            // Ocultar los otros paneles
+            pnlVacio.Visible = false;
+            pnlDetalle.Visible = false;
+
+            // Mostrar el formulario en modo "Editar"
+            pnlFormulario.Visible = true;
+            litTitulo.Text = "Editar Proveedor";
+            btnGuardar.Visible = false;
+            btnModificar.Visible = true;
+
+            // Cargar datos
+            try
             {
-                list.Remove(existing);
-                Session[SESSION_RANK] = list;
+                int id = (int)ViewState["SelectedProveedorId"];
+                Proveedor p = ListaProveedores.FirstOrDefault(x => x.Id == id);
+                if (p != null)
+                {
+                    txtNombreForm.Text = p.Nombre;
+                    txtEmailForm.Text = p.Email;
+                    txtTelefonoForm.Text = p.Telefono;
+                    txtDireccionForm.Text = p.Direccion;
+                }
             }
-            BindRankDemo();
+            catch (Exception ex)
+            {
+                // (Manejar error)
+            }
         }
-        #endregion
 
-        #region Helpers
-        private static string EscapeCsv(string s)
+        protected void btnGuardar_Click(object sender, EventArgs e)
         {
-            if (s == null) return "";
-            if (s.Contains(",") || s.Contains("\"") || s.Contains("\r") || s.Contains("\n"))
-                return $"\"{s.Replace("\"", "\"\"")}\"";
-            return s;
+            if (Page.IsValid)
+            {
+                try
+                {
+                    Proveedor nuevo = new Proveedor
+                    {
+                        Nombre = txtNombreForm.Text,
+                        Email = txtEmailForm.Text,
+                        Telefono = txtTelefonoForm.Text,
+                        Direccion = txtDireccionForm.Text
+                    };
+
+                    proveedorSQL.Agregar(nuevo);
+                    Response.Redirect("GestionProveedores.aspx", false);
+                }
+                catch (Exception ex)
+                {
+                    // (Manejar error)
+                }
+            }
         }
-        #endregion
+
+        protected void btnModificar_Click(object sender, EventArgs e)
+        {
+            if (Page.IsValid && ViewState["SelectedProveedorId"] != null)
+            {
+                try
+                {
+                    int id = (int)ViewState["SelectedProveedorId"];
+                    Proveedor modificado = new Proveedor
+                    {
+                        Id = id,
+                        Nombre = txtNombreForm.Text,
+                        Email = txtEmailForm.Text,
+                        Telefono = txtTelefonoForm.Text,
+                        Direccion = txtDireccionForm.Text
+                    };
+
+                    proveedorSQL.Modificar(modificado);
+                    Response.Redirect("GestionProveedores.aspx?id=" + id, false); // Volver al proveedor
+                }
+                catch (Exception ex)
+                {
+                    // (Manejar error)
+                }
+            }
+        }
+
+        protected void btnCancelar_Click(object sender, EventArgs e)
+        {
+            pnlFormulario.Visible = false;
+
+            // Decidir qué panel mostrar
+            if (ViewState["SelectedProveedorId"] != null)
+            {
+                pnlDetalle.Visible = true;
+            }
+            else
+            {
+                pnlVacio.Visible = true;
+            }
+        }
     }
 }
-
-
-
-    public class Proveedor
-    {
-        public string Id { get; set; }
-        public string Nombre { get; set; }
-        public string Telefono { get; set; }
-        public string TaxId { get; set; }
-        public string Address { get; set; }
-        public string Website { get; set; }
-        public string Notes { get; set; }
-    }
-
-    public class RankItem
-    {
-        public string Name { get; set; }
-        public int Score { get; set; }
-    }
-

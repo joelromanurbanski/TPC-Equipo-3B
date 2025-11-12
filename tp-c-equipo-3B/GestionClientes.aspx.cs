@@ -27,7 +27,7 @@ namespace tp_c_equipo_3B
                 BindHistorial();
                 FillEstadisticas();
 
-
+                // Activar pestaña desde querystring usando script cliente (Bootstrap debe estar cargado)
                 var tab = Request.QueryString["tab"];
                 if (!string.IsNullOrEmpty(tab))
                 {
@@ -149,6 +149,7 @@ namespace tp_c_equipo_3B
             lblMensaje.Text = "Career button clicked.";
         }
 
+        // Toolbar handlers
         protected void btnCerrarPanel_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/PaneldeControl.aspx");
@@ -185,6 +186,7 @@ namespace tp_c_equipo_3B
             lblMensaje.Text = string.Empty;
         }
 
+        // Card handlers
         protected void btnExitoCard_Click(object sender, EventArgs e)
         {
             lblMensaje.Text = "Acción Éxito desde la tarjeta.";
@@ -192,17 +194,18 @@ namespace tp_c_equipo_3B
 
         protected void btnContinuarServer_Click(object sender, EventArgs e)
         {
+            // Ejemplo: redirigir a siguiente lección
             Response.Redirect("~/Curso/GestionNegocios/Leccion2.aspx");
         }
 
-
+        // Historial y estadísticas
         private void BindHistorial()
         {
             var history = Session[SESSION_HISTORY] as List<HistoryEntry>;
             if (history == null)
             {
                 history = new List<HistoryEntry>();
-
+                // ejemplo
                 history.Add(new HistoryEntry { Date = DateTime.Now.AddDays(-3), Action = "Alta", User = "admin", Details = "Cliente Juan Pérez creado." });
                 history.Add(new HistoryEntry { Date = DateTime.Now.AddDays(-1), Action = "Edición", User = "admin", Details = "Email de Ana actualizado." });
                 Session[SESSION_HISTORY] = history;
@@ -215,8 +218,8 @@ namespace tp_c_equipo_3B
         {
             var list = (List<Cliente>)Session[SESSION_KEY] ?? new List<Cliente>();
             var total = list.Count;
-            var activos = list.Count; 
-            var recientes = list.Count(c => false); 
+            var activos = list.Count; // placeholder; ajustar según lógica real
+            var recientes = list.Count(c => false); // placeholder para 30d
 
             lblTotalClientes.Text = total.ToString();
             lblClientesActivos.Text = activos.ToString();

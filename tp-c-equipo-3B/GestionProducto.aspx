@@ -37,19 +37,23 @@
                     </div>
                     <div class="col-6 col-md-2">
                         <label class="form-label mb-1">Categoría</label>
-                        <asp:DropDownList ID="ddlCategoriaForm" runat="server" CssClass="form-select" />
+                        <asp:DropDownList ID="ddlCategoriaForm" runat="server" CssClass="form-select" 
+                            AutoPostBack="true" OnSelectedIndexChanged="Filtro_SelectedIndexChanged" />
                     </div>
                     <div class="col-6 col-md-2">
                         <label class="form-label mb-1">Marca</label>
-                        <asp:DropDownList ID="ddlMarcaForm" runat="server" CssClass="form-select" />
+                        <asp:DropDownList ID="ddlMarcaForm" runat="server" CssClass="form-select" 
+                            AutoPostBack="true" OnSelectedIndexChanged="Filtro_SelectedIndexChanged" />
                     </div>
                     <div class="col-6 col-md-2">
                         <label class="form-label mb-1">Proveedor</label>
-                        <asp:DropDownList ID="ddlProveedorFilter" runat="server" CssClass="form-select" Enabled="false" />
+                        <asp:DropDownList ID="ddlProveedorFilter" runat="server" CssClass="form-select" 
+                            AutoPostBack="true" OnSelectedIndexChanged="Filtro_SelectedIndexChanged" Enabled="false" />
                     </div>
                     <div class="col-6 col-md-2">
                         <label class="form-label mb-1">Estado de Stock</label>
-                        <asp:DropDownList ID="ddlStockFilter" runat="server" CssClass="form-select">
+                        <asp:DropDownList ID="ddlStockFilter" runat="server" CssClass="form-select" 
+                            AutoPostBack="true" OnSelectedIndexChanged="Filtro_SelectedIndexChanged">
                             <asp:ListItem Text="Todos" Value="Todos" />
                             <asp:ListItem Text="En Stock" Value="InStock" />
                             <asp:ListItem Text="Poco Stock" Value="LowStock" />
@@ -98,6 +102,15 @@
                          <asp:TextBox ID="txtStockMinimo" runat="server" CssClass="form-control" 
                             Placeholder="Ej: 5" TextMode="Number" />
                     </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Categoría</label>
+                        <asp:DropDownList ID="ddlCategoriaForm_Form" runat="server" CssClass="form-select" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Marca</label>
+                        <asp:DropDownList ID="ddlMarcaForm_Form" runat="server" CssClass="form-select" />
+                    </div>
                     
                     <div class="col-12">
                         <label class="form-label">Proveedores</label>
@@ -141,7 +154,8 @@
                     CssClass="table table-striped table-hover mb-0" 
                     OnRowEditing="gvProductos_RowEditing" 
                     OnRowDeleting="gvProductos_RowDeleting" 
-                    EmptyDataText="No hay productos para mostrar">
+                    EmptyDataText="No hay productos para mostrar"
+                    AllowPaging="True" PageSize="10" OnPageIndexChanging="gvProductos_PageIndexChanging">
                     <Columns>
                         <asp:TemplateField HeaderText="">
                             <ItemTemplate>
@@ -156,10 +170,8 @@
                         <asp:BoundField DataField="Categoria.Descripcion" HeaderText="Categoría" />
                         <asp:BoundField DataField="Marca.Descripcion" HeaderText="Marca" />
                         <asp:BoundField DataField="ProveedoresString" HeaderText="Proveedores" />
-                        
                         <asp:BoundField DataField="UltimoPrecioCompra" HeaderText="Precio Costo" DataFormatString="{0:C}" />
                         <asp:BoundField DataField="PorcentajeGanancia" HeaderText="Ganancia (%)" DataFormatString="{0:N2} %" />
-                        
                         <asp:BoundField DataField="PrecioVenta" HeaderText="Precio Venta" DataFormatString="{0:C}" />
                 
                         <asp:TemplateField HeaderText="Stock">
@@ -185,7 +197,7 @@
                         
                         <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" />
                     </Columns>
-                </asp:GridView>
+                    <PagerStyle CssClass="d-none" /> </asp:GridView>
             </div>
         </div>
 

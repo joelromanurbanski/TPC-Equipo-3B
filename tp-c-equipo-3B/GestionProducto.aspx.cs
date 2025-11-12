@@ -11,7 +11,6 @@ namespace tp_c_equipo_3B
 {
     public partial class GestionProducto : System.Web.UI.Page
     {
-
         private ArticuloSQL articuloSQL = new ArticuloSQL();
         private MarcaSQL marcaSQL = new MarcaSQL();
         private CategoriaSQL categoriaSQL = new CategoriaSQL();
@@ -21,19 +20,7 @@ namespace tp_c_equipo_3B
 
         #region "Propiedades y Helpers de Página"
 
-   
-        private const int PageSize = 10;
-        private int CurrentPage
-        {
-            get
-            {
-                if (ViewState["CurrentPage"] == null) ViewState["CurrentPage"] = 1;
-                return (int)ViewState["CurrentPage"];
-            }
-            set => ViewState["CurrentPage"] = value;
-        }
-
-      
+        // Helper de imagen para la Grilla
         protected string GetImageSource(object url)
         {
             string imageUrl = url?.ToString();
@@ -45,11 +32,11 @@ namespace tp_c_equipo_3B
 
             if (imageUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase) || imageUrl.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
-                return imageUrl; 
+                return imageUrl;
             }
             else
             {
-                return ResolveUrl("~/Imagenes/" + imageUrl); 
+                return ResolveUrl("~/Imagenes/" + imageUrl);
             }
         }
 
@@ -61,28 +48,55 @@ namespace tp_c_equipo_3B
         {
             if (!IsPostBack)
             {
+                // Cargar listas de SQL
                 CargarMarcas();
                 CargarCategorias();
                 CargarProveedores();
-                InicializarPaginado();
+
+                // Cargar la grilla
+                gvProductos.PageIndex = 0; // Iniciar en la página 0
+                BindGrid();
+
                 pnlFormulario.Visible = false;
             }
         }
 
         private void CargarMarcas()
         {
-            ddlMarcaForm.DataSource = marcaSQL.Listar();
+            var lista = marcaSQL.Listar();
+
+            // Cargar filtro
+            ddlMarcaForm.DataSource = lista;
             ddlMarcaForm.DataTextField = "Descripcion";
             ddlMarcaForm.DataValueField = "Id";
             ddlMarcaForm.DataBind();
+            ddlMarcaForm.Items.Insert(0, new ListItem("Todas", "0"));
+
+            // Cargar formulario
+            ddlMarcaForm_Form.DataSource = lista;
+            ddlMarcaForm_Form.DataTextField = "Descripcion";
+            ddlMarcaForm_Form.DataValueField = "Id";
+            ddlMarcaForm_Form.DataBind();
+            ddlMarcaForm_Form.Items.Insert(0, new ListItem("Seleccionar", "0"));
         }
 
         private void CargarCategorias()
         {
-            ddlCategoriaForm.DataSource = categoriaSQL.Listar();
+            var lista = categoriaSQL.Listar();
+
+            // Cargar filtro
+            ddlCategoriaForm.DataSource = lista;
             ddlCategoriaForm.DataTextField = "Descripcion";
             ddlCategoriaForm.DataValueField = "Id";
             ddlCategoriaForm.DataBind();
+            ddlCategoriaForm.Items.Insert(0, new ListItem("Todas", "0"));
+
+            // Cargar formulario
+            ddlCategoriaForm_Form.DataSource = lista;
+            ddlCategoriaForm_Form.DataTextField = "Descripcion";
+            ddlCategoriaForm_Form.DataValueField = "Id";
+            ddlCategoriaForm_Form.DataBind();
+            ddlCategoriaForm_Form.Items.Insert(0, new ListItem("Seleccionar", "0"));
         }
 
         private void CargarProveedores()
@@ -102,12 +116,57 @@ namespace tp_c_equipo_3B
             ddlProveedorFilter.Enabled = true;
         }
 
-        private void CargarProductosPaginados()
+        // --- MÉTODO CENTRAL PARA CARGAR Y FILTRAR ---
+        private void BindGrid()
         {
-            var listaCompleta = articuloSQL.Listar() ?? new List<Articulo>();
+            // ¡CAMBIO IMPORTANTE!
+            // Cargar la lista directamente desde la BD cada vez.
+            // Se elimina la dependencia del ViewState.
+            var listaFiltrada = articuloSQL.Listar();
 
-           
-            var listaProcesada = listaCompleta.Select(art => {
+            // 1. Aplicar filtro de texto
+            string filtroTexto = txtBuscar.Text.Trim().ToLower();
+            if (!string.IsNullOrEmpty(filtroTexto))
+            {
+                listaFiltrada = listaFiltrada.Where(a => a.Nombre.ToLower().Contains(filtroTexto) || a.Codigo.ToLower().Contains(filtroTexto)).ToList();
+            }
+
+            // 2. Aplicar filtro de Categoría
+            int idCategoria = int.Parse(ddlCategoriaForm.SelectedValue);
+            if (idCategoria > 0)
+            {
+                listaFiltrada = listaFiltrada.Where(a => a.IdCategoria == idCategoria).ToList();
+            }
+
+            // 3. Aplicar filtro de Marca
+            int idMarca = int.Parse(ddlMarcaForm.SelectedValue);
+            if (idMarca > 0)
+            {
+                listaFiltrada = listaFiltrada.Where(a => a.IdMarca == idMarca).ToList();
+            }
+
+            // 4. Aplicar filtro de Stock
+            string stockFiltro = ddlStockFilter.SelectedValue;
+            if (stockFiltro != "Todos")
+            {
+                listaFiltrada = listaFiltrada.Where(a => {
+                    if (stockFiltro == "InStock") return a.StockActual > a.StockMinimo;
+                    if (stockFiltro == "LowStock") return a.StockActual > 0 && a.StockActual <= a.StockMinimo;
+                    if (stockFiltro == "OutOfStock") return a.StockActual == 0;
+                    return true;
+                }).ToList();
+            }
+
+            // 5. Aplicar filtro de Proveedor
+            int idProveedor = int.Parse(ddlProveedorFilter.SelectedValue);
+            if (idProveedor > 0)
+            {
+                List<int> idsArticulosDelProveedor = articuloProveedorSQL.ListarIdsArticuloPorProveedor(idProveedor);
+                listaFiltrada = listaFiltrada.Where(a => idsArticulosDelProveedor.Contains(a.Id)).ToList();
+            }
+
+            // Proyectamos la lista FILTRADA a un ViewModel anónimo para la grilla
+            var listaProcesada = listaFiltrada.Select(art => {
                 string stockDisplay;
                 string stockClass;
                 int stock = art.StockActual;
@@ -145,106 +204,65 @@ namespace tp_c_equipo_3B
                     art.StockMinimo,
                     art.ProveedoresString,
                     art.UltimoPrecioCompra,
-
-                    PrecioVenta = precioVenta,
-                    StockDisplay = stockDisplay,
-                    StockClass = stockClass
-                };
-            });
-
-            int totalItems = listaCompleta.Count;
-            int totalPages = (int)Math.Ceiling((double)totalItems / PageSize);
-            if (totalPages == 0) totalPages = 1;
-
-            if (CurrentPage < 1) CurrentPage = 1;
-            if (CurrentPage > totalPages) CurrentPage = totalPages;
-
-            var pageItems = listaProcesada.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
-
-            gvProductos.DataSource = pageItems;
-            gvProductos.DataBind();
-
-            lblPagina.Text = $"{CurrentPage} / {totalPages}";
-            lblPaginado.Text = $"Mostrando {((CurrentPage - 1) * PageSize) + 1}-{Math.Min(CurrentPage * PageSize, totalItems)} de {totalItems} resultados";
-
-            btnPrev.Enabled = CurrentPage > 1;
-            btnNext.Enabled = CurrentPage < totalPages;
-        }
-
-        private void InicializarPaginado()
-        {
-            CurrentPage = 1;
-            CargarProductosPaginados();
-        }
-
-        protected void btnPrev_Click(object sender, EventArgs e)
-        {
-            CurrentPage = Math.Max(1, CurrentPage - 1);
-            CargarProductosPaginados();
-        }
-
-        protected void btnNext_Click(object sender, EventArgs e)
-        {
-            CurrentPage = CurrentPage + 1;
-            CargarProductosPaginados();
-        }
-
-        protected void btnBuscar_Click(object sender, EventArgs e)
-        {
-            string filtro = txtBuscar.Text.ToLower();
-            var lista = articuloSQL.Listar();
-            var filtrados = lista.FindAll(x => x.Nombre.ToLower().Contains(filtro) || x.Codigo.ToLower().Contains(filtro));
-
-            var listaProcesada = filtrados.Select(art => {
-                string stockDisplay;
-                string stockClass;
-                int stock = art.StockActual;
-                if (stock == 0)
-                {
-                    stockDisplay = "Agotado";
-                    stockClass = "table-stock-status-out-of-stock";
-                }
-                else if (stock < art.StockMinimo)
-                {
-                    stockDisplay = "Poco Stock";
-                    stockClass = "table-stock-status-low-stock";
-                }
-                else
-                {
-                    stockDisplay = "En Stock";
-                    stockClass = "table-stock-status-in-stock";
-                }
-                decimal precioVenta = art.UltimoPrecioCompra * (1 + (art.PorcentajeGanancia / 100));
-
-                return new
-                {
-                    art.Id,
-                    art.Codigo,
-                    art.Nombre,
-                    art.Descripcion,
-                    art.IdMarca,
-                    art.IdCategoria,
-                    art.Marca,
-                    art.Categoria,
-                    art.UrlImagen,
-                    art.PorcentajeGanancia,
-                    art.StockMinimo,
-                    art.ProveedoresString,
-                    art.UltimoPrecioCompra,
-
                     PrecioVenta = precioVenta,
                     StockDisplay = stockDisplay,
                     StockClass = stockClass
                 };
             }).ToList();
 
+            // Aplicar paginación a la lista PROCESADA
             gvProductos.DataSource = listaProcesada;
             gvProductos.DataBind();
 
-            lblPaginado.Text = $"Mostrando {listaProcesada.Count} resultados";
-            lblPagina.Text = "1 / 1";
-            btnPrev.Enabled = false;
-            btnNext.Enabled = false;
+            // Actualizar etiquetas de paginado
+            int totalItems = listaProcesada.Count;
+            int totalPages = gvProductos.PageCount;
+            if (totalPages == 0) totalPages = 1;
+            int currentPage = gvProductos.PageIndex + 1;
+
+            lblPagina.Text = $"{currentPage} / {totalPages}";
+            lblPaginado.Text = $"Mostrando {totalItems} resultados";
+
+            btnPrev.Enabled = !gvProductos.PageIndex.Equals(0);
+            btnNext.Enabled = !gvProductos.PageIndex.Equals(totalPages - 1);
+        }
+
+        // --- Eventos de Paginado y Filtros ---
+
+        protected void btnPrev_Click(object sender, EventArgs e)
+        {
+            if (gvProductos.PageIndex > 0)
+            {
+                gvProductos.PageIndex--;
+                BindGrid();
+            }
+        }
+
+        protected void btnNext_Click(object sender, EventArgs e)
+        {
+            if (gvProductos.PageIndex < gvProductos.PageCount - 1)
+            {
+                gvProductos.PageIndex++;
+                BindGrid();
+            }
+        }
+
+        protected void gvProductos_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvProductos.PageIndex = e.NewPageIndex;
+            BindGrid();
+        }
+
+        protected void btnBuscar_Click(object sender, EventArgs e)
+        {
+            gvProductos.PageIndex = 0; // Resetear a la página 1
+            BindGrid();
+        }
+
+        protected void Filtro_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            gvProductos.PageIndex = 0; // Resetear a la página 1
+            BindGrid();
         }
 
         #endregion
@@ -273,8 +291,8 @@ namespace tp_c_equipo_3B
                     Descripcion = txtDescripcion.Text,
                     PorcentajeGanancia = decimal.Parse(txtPorcentajeGanancia.Text),
                     StockMinimo = int.Parse(txtStockMinimo.Text),
-                    IdMarca = int.Parse(ddlMarcaForm.SelectedValue),
-                    IdCategoria = int.Parse(ddlCategoriaForm.SelectedValue),
+                    IdMarca = int.Parse(ddlMarcaForm_Form.SelectedValue),
+                    IdCategoria = int.Parse(ddlCategoriaForm_Form.SelectedValue),
                     UrlImagen = urlImagenPrincipal,
                     StockActual = int.Parse(txtStockActual.Text),
                     UltimoPrecioCompra = decimal.Parse(txtUltimoPrecioCompra.Text)
@@ -288,7 +306,7 @@ namespace tp_c_equipo_3B
 
                 lblMensaje.Text = "Producto agregado correctamente.";
                 pnlFormulario.Visible = false;
-                InicializarPaginado();
+                BindGrid(); // Recargar grilla
 
                 btnGuardar.Visible = true;
                 btnModificar.Visible = true;
@@ -314,8 +332,8 @@ namespace tp_c_equipo_3B
                     Descripcion = txtDescripcion.Text,
                     PorcentajeGanancia = decimal.Parse(txtPorcentajeGanancia.Text),
                     StockMinimo = int.Parse(txtStockMinimo.Text),
-                    IdMarca = int.Parse(ddlMarcaForm.SelectedValue),
-                    IdCategoria = int.Parse(ddlCategoriaForm.SelectedValue),
+                    IdMarca = int.Parse(ddlMarcaForm_Form.SelectedValue),
+                    IdCategoria = int.Parse(ddlCategoriaForm_Form.SelectedValue),
                     UrlImagen = urlImagenPrincipal,
                     StockActual = int.Parse(txtStockActual.Text),
                     UltimoPrecioCompra = decimal.Parse(txtUltimoPrecioCompra.Text)
@@ -329,7 +347,7 @@ namespace tp_c_equipo_3B
 
                 lblMensaje.Text = "Producto modificado correctamente.";
                 pnlFormulario.Visible = false;
-                InicializarPaginado();
+                BindGrid(); // Recargar grilla
 
                 btnGuardar.Visible = true;
                 btnModificar.Visible = true;
@@ -381,6 +399,7 @@ namespace tp_c_equipo_3B
             }
             else if (idArticuloExistente.HasValue)
             {
+                // ¡CAMBIO IMPORTANTE! Cargar la lista fresca para buscar
                 Articulo artActual = articuloSQL.Listar().Find(x => x.Id == idArticuloExistente.Value);
                 if (artActual != null)
                 {
@@ -434,8 +453,8 @@ namespace tp_c_equipo_3B
             txtStockActual.Text = "0";
             txtUltimoPrecioCompra.Text = "0";
 
-            if (ddlMarcaForm.Items.Count > 0) ddlMarcaForm.SelectedIndex = 0;
-            if (ddlCategoriaForm.Items.Count > 0) ddlCategoriaForm.SelectedIndex = 0;
+            if (ddlMarcaForm_Form.Items.Count > 0) ddlMarcaForm_Form.SelectedIndex = 0;
+            if (ddlCategoriaForm_Form.Items.Count > 0) ddlCategoriaForm_Form.SelectedIndex = 0;
             cblProveedoresForm.ClearSelection();
 
             rblImagenTipo.SelectedValue = "UPLOAD";
@@ -451,10 +470,12 @@ namespace tp_c_equipo_3B
         protected void gvProductos_RowEditing(object sender, GridViewEditEventArgs e)
         {
             int id = Convert.ToInt32(gvProductos.DataKeys[e.NewEditIndex].Value);
+
+            // ¡CAMBIO IMPORTANTE! Cargar la lista fresca para buscar
             Articulo art = articuloSQL.Listar().Find(x => x.Id == id);
             if (art == null) return;
 
-
+            // Rellenar campos de texto
             txtCodigo.Text = art.Codigo;
             txtNombre.Text = art.Nombre;
             txtDescripcion.Text = art.Descripcion;
@@ -464,10 +485,10 @@ namespace tp_c_equipo_3B
             txtStockActual.Text = art.StockActual.ToString();
             txtUltimoPrecioCompra.Text = art.UltimoPrecioCompra.ToString("N2");
 
-            ddlMarcaForm.SelectedValue = art.IdMarca.ToString();
-            ddlCategoriaForm.SelectedValue = art.IdCategoria.ToString();
+            ddlMarcaForm_Form.SelectedValue = art.IdMarca.ToString();
+            ddlCategoriaForm_Form.SelectedValue = art.IdCategoria.ToString();
 
-            if (!string.IsNullOrEmpty(art.UrlImagen) && (art.UrlImagen.StartsWith("http") || art.UrlImagen.StartsWith("https")))
+            if (!string.IsNullOrEmpty(art.UrlImagen) && (art.UrlImagen.StartsWith("http") || art.UrlImagen.StartsWith("httpsU")))
             {
                 rblImagenTipo.SelectedValue = "URL";
                 pnlUrl.Visible = true;
@@ -482,7 +503,6 @@ namespace tp_c_equipo_3B
                 txtUrlImagen.Text = "";
             }
 
- 
             cblProveedoresForm.ClearSelection();
             List<int> idsProveedores = articuloProveedorSQL.ListarIdsPorArticulo(id);
             foreach (ListItem li in cblProveedoresForm.Items)
@@ -493,7 +513,6 @@ namespace tp_c_equipo_3B
             ViewState["IdEditar"] = id;
             pnlFormulario.Visible = true;
 
-   
             btnGuardar.Visible = false;
             btnModificar.Visible = true;
 
@@ -511,7 +530,7 @@ namespace tp_c_equipo_3B
                 articuloSQL.Eliminar(id);
 
                 lblMensaje.Text = "Producto eliminado.";
-                InicializarPaginado();
+                BindGrid(); // Recargar grilla
             }
             catch (Exception ex)
             {

@@ -205,8 +205,7 @@
 </div>
 </main>
 </div>
-<!-- Modal para Agregar/Editar Usuario -->
-<div class="fixed inset-0 bg-black/50 flex items-center justify-center hidden" id="user-modal">
+ <div class="fixed inset-0 bg-black/50 flex items-center justify-center hidden" id="user-modal">
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-md m-4">
 <h2 class="text-2xl font-bold mb-6 text-text-light dark:text-text-dark">Agregar Nuevo Usuario</h2>
 <form>
@@ -246,8 +245,7 @@
 </form>
 </div>
 </div>
-
-<div class="fixed inset-0 bg-black/50 flex items-center justify-center hidden" id="delete-confirm-modal">
+ <div class="fixed inset-0 bg-black/50 flex items-center justify-center hidden" id="delete-confirm-modal">
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-sm m-4 text-center">
 <div class="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4">
 <span class="material-symbols-outlined text-error text-4xl">delete</span>
