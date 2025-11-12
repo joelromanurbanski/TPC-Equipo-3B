@@ -246,7 +246,7 @@
 </form>
 </div>
 </div>
-<!-- Modal de confirmación de eliminación -->
+
 <div class="fixed inset-0 bg-black/50 flex items-center justify-center hidden" id="delete-confirm-modal">
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-sm m-4 text-center">
 <div class="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4">

@@ -14,10 +14,10 @@
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
 
-  <!-- ScriptManagerProxy -->
+
   <asp:ScriptManagerProxy ID="ScriptManagerProxyPage" runat="server" />
 
-  <!-- TOOLBAR -->
+
   <div class="d-flex justify-content-end gap-2 mb-3 align-items-center">
     <div class="input-group me-2" style="max-width:420px;">
       <input id="txtGlobalSearch" name="txtGlobalSearch" class="form-control" placeholder="Buscar en proveedores..." />
@@ -32,7 +32,7 @@
   </div>
 
   <div class="row gx-4">
-    <!-- SIDEBAR: lista de proveedores -->
+ 
     <aside class="col-md-4">
       <div class="mb-3">
         <div class="input-group">
@@ -72,7 +72,7 @@
       </div>
     </aside>
 
-    <!-- MAIN: detalle + pestañas -->
+   
     <main class="col-md-8">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -85,7 +85,7 @@
         </div>
       </div>
 
-      <!-- NAV PESTAÑAS -->
+
       <ul class="nav nav-tabs mb-3" id="tabsGestionProveedores" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="tab-datos" data-bs-toggle="tab" data-bs-target="#content-datos" type="button" role="tab" aria-controls="content-datos" aria-selected="true">Datos Generales</button>
@@ -99,7 +99,7 @@
       </ul>
 
       <div class="tab-content" id="tabsContentGestionProveedores">
-        <!-- Datos -->
+ 
         <div class="tab-pane fade show active" id="content-datos" role="tabpanel" aria-labelledby="tab-datos">
           <div class="card p-3 mb-3">
             <div class="row g-3">
@@ -131,7 +131,7 @@
           </div>
         </div>
 
-        <!-- Contactos -->
+
         <div class="tab-pane fade" id="content-contactos" role="tabpanel" aria-labelledby="tab-contactos">
           <div class="card p-3 mb-3">
             <asp:GridView ID="gvContactos" runat="server" CssClass="table table-sm" AutoGenerateColumns="false">
@@ -145,7 +145,7 @@
           </div>
         </div>
 
-        <!-- Productos -->
+
         <div class="tab-pane fade" id="content-productos" role="tabpanel" aria-labelledby="tab-productos">
           <div class="card p-3 mb-3">
             <asp:GridView ID="gvProductos" runat="server" CssClass="table table-sm" AutoGenerateColumns="false">
@@ -159,7 +159,6 @@
         </div>
       </div>
 
-      <!-- Rank demo -->
       <div class="card p-3 mb-3" style="max-width:420px;">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <strong>Rank demo</strong>
@@ -181,7 +180,7 @@
     </main>
   </div>
 
-  <!-- Script para pestañas (activar por ?tab=...) -->
+
   <script type="text/javascript">
       (function () {
           function activateTabFromQuery() {

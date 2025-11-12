@@ -64,27 +64,6 @@ namespace SQL
             }
         }
 
-        public void Modificar(Imagen imagen)
-        {
-            AccesoDatos datos = new AccesoDatos();
-
-            try
-            {
-                datos.setearConsulta("UPDATE Imagen SET UrlImagen = @Url WHERE Id = @Id");
-                datos.setearParametro("@Url", imagen.UrlImagen);
-                datos.setearParametro("@Id", imagen.Id);
-                datos.ejecutarAccion();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
-        }
-
         public void EliminarPorArticulo(int idArticulo)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -103,28 +82,5 @@ namespace SQL
                 datos.cerrarConexion();
             }
         }
-
-        public void EliminarPorUrl(string url, int idArticulo)
-        {
-            AccesoDatos datos = new AccesoDatos();
-            try
-            {
-                datos.setearConsulta("DELETE FROM Imagen WHERE UrlImagen = @url AND IdArticulo = @idArticulo");
-                datos.setearParametro("@url", url);
-                datos.setearParametro("@idArticulo", idArticulo);
-                datos.ejecutarAccion();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
-        }
-
     }
-
-
 }

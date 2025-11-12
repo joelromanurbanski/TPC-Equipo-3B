@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dominio;
 
+
 namespace SQL
 {
     public class CompraSQL
@@ -15,6 +16,8 @@ namespace SQL
 
             try
             {
+                datos.iniciarTransaccion();
+
                 datos.setearConsulta("INSERT INTO COMPRAS (Fecha, IdProveedor) OUTPUT INSERTED.Id VALUES (@Fecha, @IdProveedor)");
                 datos.setearParametro("@Fecha", compra.Fecha);
                 datos.setearParametro("@IdProveedor", compra.Proveedor.Id);
@@ -30,21 +33,26 @@ namespace SQL
                     datos.setearParametro("@PrecioCompra", detalle.PrecioCompra);
                     datos.ejecutarAccion();
 
-                    // Actualizar stock y precio
-                    datos.setearConsulta("UPDATE ARTICULOS SET StockActual = StockActual + @Cantidad, Precio = @PrecioCompra WHERE Id = @IdArticulo");
+                    datos.setearConsulta(@"UPDATE ARTICULOS 
+                                           SET StockActual = StockActual + @Cantidad, 
+                                               UltimoPrecioCompra = @PrecioCompra 
+                                           WHERE Id = @IdArticulo");
                     datos.setearParametro("@Cantidad", detalle.Cantidad);
                     datos.setearParametro("@PrecioCompra", detalle.PrecioCompra);
                     datos.setearParametro("@IdArticulo", detalle.Articulo.Id);
                     datos.ejecutarAccion();
                 }
+
+                datos.commitTransaccion();
             }
             catch (Exception ex)
             {
+                datos.rollbackTransaccion();
                 throw ex;
             }
             finally
             {
-                datos.cerrarConexion();
+                datos.cerrarConexionTransaccional();
             }
         }
     }

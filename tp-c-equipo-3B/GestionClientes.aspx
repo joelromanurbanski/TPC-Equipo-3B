@@ -14,10 +14,9 @@
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
 
-    <!-- ScriptManagerProxy (Site.master contiene ScriptManager) -->
+  
     <asp:ScriptManagerProxy ID="ScriptManagerProxyPage" runat="server"></asp:ScriptManagerProxy>
 
-    <!-- TOP TOOLBAR -->
     <div class="d-flex justify-content-end gap-2 mb-3">
         <asp:Button ID="btnCerrarPanel" runat="server" Text="Cerrar" CssClass="btn btn-outline-secondary btn-sm" OnClick="btnCerrarPanel_Click" />
         <asp:Button ID="btnExportar" runat="server" Text="Exportar" CssClass="btn btn-outline-primary btn-sm" OnClick="btnExportar_Click" />
@@ -26,7 +25,7 @@
         <asp:Button ID="btnNuevoClienteTop" runat="server" Text="Nuevo Cliente" CssClass="btn btn-primary btn-sm" OnClick="btnNuevoCliente_Click" />
     </div>
 
-    <!-- NAV PESTAÑAS -->
+
     <ul class="nav nav-tabs mb-3" id="tabsGestionClientes" role="tablist">
       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="tab-clientes" data-bs-toggle="tab" data-bs-target="#content-clientes" type="button" role="tab" aria-controls="content-clientes" aria-selected="true">Clientes</button>
@@ -39,11 +38,10 @@
       </li>
     </ul>
 
-    <!-- CONTENIDO PESTAÑAS -->
+
     <div class="tab-content" id="tabsContentGestionClientes">
       <div class="tab-pane fade show active" id="content-clientes" role="tabpanel" aria-labelledby="tab-clientes">
 
-        <!-- CARD SOLICITADA: Gestión de Negocios -->
         <div class="card p-3 mb-3">
           <div class="d-flex align-items-start justify-content-between">
             <div>
@@ -79,14 +77,11 @@
           </div>
         </div>
 
-        <!-- Contenido principal: header, acciones y lista de clientes -->
         <div class="relative">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="mb-0">Administración de Clientes</h3>
                 <asp:Button ID="btnNuevoCliente" runat="server" Text="Nuevo Cliente" CssClass="btn btn-primary" OnClick="btnNuevoCliente_Click" />
             </div>
-
-            <!-- Formulario (controles server para code-behind) -->
             <asp:Panel ID="pnlClienteForm" runat="server" CssClass="card p-3 mb-3" Visible="false">
                 <asp:HiddenField ID="hfEditingId" runat="server" />
                 <div class="row g-3">
@@ -196,7 +191,6 @@
       </div>
     </div>
 
-    <!-- Script para mantener pestaña en querystring y activar por URL -->
     <script type="text/javascript">
         (function () {
             function activateTabFromQuery() {

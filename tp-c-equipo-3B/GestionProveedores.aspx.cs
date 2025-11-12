@@ -18,18 +18,7 @@ namespace tp_c_equipo_3B
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            //if (!IsPostBack)
-            //{
-            //    if (Session[SESSION_PROVEEDORES] == null)
-            //    {
-            //        Session[SESSION_PROVEEDORES] = new List<Proveedor>();
-            //        SeedDemoData();
-            //    }
-
-            //    BindSidebar();
-            //    BindContactos();
-            //    BindProductos();
-            //    BindRankDemo();
+            
 
             var tab = Request.QueryString["tab"];
             if (!string.IsNullOrEmpty(tab))
@@ -84,7 +73,7 @@ namespace tp_c_equipo_3B
         protected void btnGlobalSearch_Click(object sender, EventArgs e)
         {
             var q = Request.Form["txtGlobalSearch"] ?? string.Empty;
-            // ejemplo: buscar y mostrar solo coincidencias en sidebar
+           
             var list = (List<Proveedor>)Session[SESSION_PROVEEDORES] ?? new List<Proveedor>();
             var filtered = list.Where(x => x.Nombre.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
             rptProveedores.DataSource = filtered;
@@ -106,15 +95,12 @@ namespace tp_c_equipo_3B
 
         protected void btnImportar_Click(object sender, EventArgs e)
         {
-            // placeholder
+            
         }
 
         protected void btnRefrescar_Click(object sender, EventArgs e)
         {
-            //BindSidebar();
-            //BindContactos();
-            //BindProductos();
-            //BindRankDemo();
+            
         }
 
         protected void btnNuevoProveedor_Click(object sender, EventArgs e)
@@ -124,7 +110,7 @@ namespace tp_c_equipo_3B
 
         protected void btnEditarProveedor_Click(object sender, EventArgs e)
         {
-            // placeholder: mostrar panel de edición si lo implementás
+            
         }
 
         protected void btnEliminarProveedor_Click(object sender, EventArgs e)

@@ -16,7 +16,6 @@
         .badge-tag { background:#f1f3f5; color:#111; border-radius:999px; padding:.35rem .6rem; font-size:.85rem; }
         .nav-brand { font-weight:700; }
 
-        /* Step bar styles */
         .step-bar { background:#0f1724; color:#e6eef8; padding:10px 0; }
         .step-bar .inner { display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:1200px; margin:0 auto; padding:0 16px; }
         .step-left { display:flex; flex-direction:column; gap:4px; }
@@ -35,7 +34,7 @@
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server" />
 
-        <!-- NAVBAR -->
+        
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand nav-brand" runat="server" href="~/PaneldeControl.aspx">Panel de Control</a>
@@ -90,7 +89,7 @@
             </div>
         </div>
 
-        <!-- BARRA "Part A: Context" VISIBLE EN TODAS LAS PESTAÑAS -->
+       
         <div class="step-bar" id="stepBarContainer" runat="server">
             <div class="inner">
                 <div class="step-left">
@@ -106,12 +105,10 @@
             </div>
         </div>
 
-        <!-- CONTENIDO -->
         <div class="container my-4">
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
         </div>
 
-        <!-- FOOTER -->
         <footer class="py-3 bg-light mt-auto">
             <div class="container text-muted small">&copy; <%: DateTime.Now.Year %> - Gestión de Negocios</div>
         </footer>

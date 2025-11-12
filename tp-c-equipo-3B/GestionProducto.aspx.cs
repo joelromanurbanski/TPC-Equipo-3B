@@ -11,12 +11,17 @@ namespace tp_c_equipo_3B
 {
     public partial class GestionProducto : System.Web.UI.Page
     {
+
         private ArticuloSQL articuloSQL = new ArticuloSQL();
         private MarcaSQL marcaSQL = new MarcaSQL();
         private CategoriaSQL categoriaSQL = new CategoriaSQL();
         private ImagenSQL imagenSQL = new ImagenSQL();
+        private ProveedorSQL proveedorSQL = new ProveedorSQL();
+        private ArticuloProveedorSQL articuloProveedorSQL = new ArticuloProveedorSQL();
 
-        // Paginado
+        #region "Propiedades y Helpers de Página"
+
+   
         private const int PageSize = 10;
         private int CurrentPage
         {
@@ -28,115 +33,41 @@ namespace tp_c_equipo_3B
             set => ViewState["CurrentPage"] = value;
         }
 
+      
+        protected string GetImageSource(object url)
+        {
+            string imageUrl = url?.ToString();
+
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+                return ResolveUrl("~/Imagenes/default-product.png");
+            }
+
+            if (imageUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase) || imageUrl.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            {
+                return imageUrl; 
+            }
+            else
+            {
+                return ResolveUrl("~/Imagenes/" + imageUrl); 
+            }
+        }
+
+        #endregion
+
+        #region "Eventos de Carga y Paginado"
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 CargarMarcas();
                 CargarCategorias();
+                CargarProveedores();
                 InicializarPaginado();
                 pnlFormulario.Visible = false;
-
-                // Intento de interactuar con la MasterPage de forma segura
-                var master = this.Master as tp_c_equipo_3B.SiteMaster;
-                if (master != null)
-                {
-                    // Ocultar link Usuarios a no administradores (si existe)
-                    if (Session["Rol"]?.ToString() != "Admin")
-                    {
-                        var linkUsuarios = master.FindControl("linkUsuarios");
-                        if (linkUsuarios != null) linkUsuarios.Visible = false;
-                    }
-
-                    // Asegurarse de que la barra "Part A: Context" esté visible por defecto
-                    var stepBar = master.FindControl("stepBarContainer") as System.Web.UI.Control;
-                    if (stepBar != null)
-                    {
-                        string path = Request.AppRelativeCurrentExecutionFilePath ?? "";
-                        if (path.Equals("~/Login.aspx", StringComparison.OrdinalIgnoreCase)
-                            || path.Equals("~/InicioSesion.aspx", StringComparison.OrdinalIgnoreCase))
-                        {
-                            stepBar.Visible = false;
-                        }
-                        else
-                        {
-                            stepBar.Visible = true;
-                        }
-                    }
-
-                    // Marcar la pestaña activa buscando anchors con runat=server por su href
-                    try
-                    {
-                        // obtiene la ruta actual relativa: "/GestionProducto.aspx"
-                        string currentPage = VirtualPathUtility.ToAppRelative(Request.AppRelativeCurrentExecutionFilePath)
-                                            .TrimStart('~').ToLowerInvariant();
-
-                        // helper local para buscar controles recursivamente dentro de la master
-                        Func<System.Web.UI.Control, string, System.Web.UI.Control> FindControlRecursive = null;
-                        FindControlRecursive = (parent, id) =>
-                        {
-                            if (parent == null) return null;
-                            var c = parent.FindControl(id);
-                            if (c != null) return c;
-                            foreach (System.Web.UI.Control child in parent.Controls)
-                            {
-                                var found = FindControlRecursive(child, id);
-                                if (found != null) return found;
-                            }
-                            return null;
-                        };
-
-                        // intentar por id conocido "mainNav" o usar toda la master como raíz de búsqueda
-                        var navContainer = master.FindControl("mainNav") ?? FindControlRecursive(master, "mainNav");
-                        var searchRoot = (System.Web.UI.Control)navContainer ?? (System.Web.UI.Control)master;
-
-                        // recolectar anchors (<a runat="server">)
-                        var anchors = new List<System.Web.UI.HtmlControls.HtmlAnchor>();
-                        void CollectAnchors(System.Web.UI.Control root)
-                        {
-                            foreach (System.Web.UI.Control c in root.Controls)
-                            {
-                                if (c is System.Web.UI.HtmlControls.HtmlAnchor anchor && !string.IsNullOrEmpty(anchor.HRef))
-                                    anchors.Add(anchor);
-                                else
-                                    CollectAnchors(c);
-                            }
-                        }
-                        CollectAnchors(searchRoot);
-
-                        foreach (var a in anchors)
-                        {
-                            try
-                            {
-                                var href = VirtualPathUtility.ToAppRelative(a.HRef).TrimStart('~').ToLowerInvariant();
-                                if (currentPage.EndsWith(href.TrimStart('~')) || href.EndsWith(currentPage.TrimStart('/')))
-                                {
-                                    a.Attributes["class"] = ((a.Attributes["class"] ?? "") + " active").Trim();
-                                }
-                                else
-                                {
-                                    var cls = (a.Attributes["class"] ?? "").Replace("active", "").Trim();
-                                    a.Attributes["class"] = cls;
-                                }
-                            }
-                            catch { /* ignorar anchors malformados */ }
-                        }
-                    }
-                    catch
-                    {
-                        // no interrumpir la carga si falla la detección
-                    }
-                }
-                else
-                {
-                    // Fallback: si Master no es del tipo esperado, intentar localizar el control por ID directamente
-                    var fallbackStep = FindControl("stepBarContainer") as System.Web.UI.Control;
-                    if (fallbackStep != null) fallbackStep.Visible = true;
-                }
             }
         }
-
-
 
         private void CargarMarcas()
         {
@@ -154,80 +85,72 @@ namespace tp_c_equipo_3B
             ddlCategoriaForm.DataBind();
         }
 
-        // Nota: este método mantiene la lógica de StockDisplay/StockClass
-        private void CargarProductos()
+        private void CargarProveedores()
         {
-            var lista = articuloSQL.Listar() ?? new List<Articulo>();
+            var proveedores = proveedorSQL.Listar();
 
-            foreach (var art in lista)
-            {
-                int stock = art.StockActual;
+            cblProveedoresForm.DataSource = proveedores;
+            cblProveedoresForm.DataTextField = "Nombre";
+            cblProveedoresForm.DataValueField = "Id";
+            cblProveedoresForm.DataBind();
 
-                if (stock == 0)
-                {
-                    art.StockDisplay = "Agotado";
-                    art.StockClass = "table-stock-status-out-of-stock";
-                }
-                else if (stock < 5)
-                {
-                    art.StockDisplay = "Poco Stock";
-                    art.StockClass = "table-stock-status-low-stock";
-                }
-                else
-                {
-                    art.StockDisplay = "En Stock";
-                    art.StockClass = "table-stock-status-in-stock";
-                }
-            }
-
-            gvProductos.DataSource = lista;
-            gvProductos.DataBind();
+            ddlProveedorFilter.DataSource = proveedores;
+            ddlProveedorFilter.DataTextField = "Nombre";
+            ddlProveedorFilter.DataValueField = "Id";
+            ddlProveedorFilter.DataBind();
+            ddlProveedorFilter.Items.Insert(0, new ListItem("Todos", "0"));
+            ddlProveedorFilter.Enabled = true;
         }
 
-        // Helper para obtener URL de imagen (usado por el TemplateField)
-        protected string GetImageUrl(object firstImageObj, object urlImagenObj)
-        {
-            try
-            {
-                var first = firstImageObj?.ToString();
-                if (!string.IsNullOrEmpty(first)) return ResolveUrl(first);
-
-                var u = urlImagenObj?.ToString();
-                if (!string.IsNullOrEmpty(u)) return ResolveUrl(u);
-
-                return ResolveUrl("~/Imagenes/default-product.png");
-            }
-            catch
-            {
-                return ResolveUrl("~/Imagenes/default-product.png");
-            }
-        }
-
-        // Paginado: carga paginada usando LINQ sobre la lista completa
         private void CargarProductosPaginados()
         {
             var listaCompleta = articuloSQL.Listar() ?? new List<Articulo>();
 
-            // Preparar StockDisplay/StockClass en toda la lista (opcional: hacerlo solo en pageItems)
-            foreach (var art in listaCompleta)
-            {
+           
+            var listaProcesada = listaCompleta.Select(art => {
+                string stockDisplay;
+                string stockClass;
                 int stock = art.StockActual;
+
                 if (stock == 0)
                 {
-                    art.StockDisplay = "Agotado";
-                    art.StockClass = "table-stock-status-out-of-stock";
+                    stockDisplay = "Agotado";
+                    stockClass = "table-stock-status-out-of-stock";
                 }
-                else if (stock < 5)
+                else if (stock < art.StockMinimo)
                 {
-                    art.StockDisplay = "Poco Stock";
-                    art.StockClass = "table-stock-status-low-stock";
+                    stockDisplay = "Poco Stock";
+                    stockClass = "table-stock-status-low-stock";
                 }
                 else
                 {
-                    art.StockDisplay = "En Stock";
-                    art.StockClass = "table-stock-status-in-stock";
+                    stockDisplay = "En Stock";
+                    stockClass = "table-stock-status-in-stock";
                 }
-            }
+
+                decimal precioVenta = art.UltimoPrecioCompra * (1 + (art.PorcentajeGanancia / 100));
+
+                return new
+                {
+                    art.Id,
+                    art.Codigo,
+                    art.Nombre,
+                    art.Descripcion,
+                    art.IdMarca,
+                    art.IdCategoria,
+                    art.Marca,
+                    art.Categoria,
+                    art.UrlImagen,
+                    art.PorcentajeGanancia,
+                    art.StockMinimo,
+                    art.ProveedoresString,
+                    art.UltimoPrecioCompra,
+
+                    PrecioVenta = precioVenta,
+                    StockDisplay = stockDisplay,
+                    StockClass = stockClass
+                };
+            });
 
             int totalItems = listaCompleta.Count;
             int totalPages = (int)Math.Ceiling((double)totalItems / PageSize);
@@ -236,7 +159,7 @@ namespace tp_c_equipo_3B
             if (CurrentPage < 1) CurrentPage = 1;
             if (CurrentPage > totalPages) CurrentPage = totalPages;
 
-            var pageItems = listaCompleta.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+            var pageItems = listaProcesada.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
 
             gvProductos.DataSource = pageItems;
             gvProductos.DataBind();
@@ -244,7 +167,6 @@ namespace tp_c_equipo_3B
             lblPagina.Text = $"{CurrentPage} / {totalPages}";
             lblPaginado.Text = $"Mostrando {((CurrentPage - 1) * PageSize) + 1}-{Math.Min(CurrentPage * PageSize, totalItems)} de {totalItems} resultados";
 
-            // Activar/desactivar botones según corresponda
             btnPrev.Enabled = CurrentPage > 1;
             btnNext.Enabled = CurrentPage < totalPages;
         }
@@ -255,7 +177,6 @@ namespace tp_c_equipo_3B
             CargarProductosPaginados();
         }
 
-        // Manejadores de paginado vinculados en el .aspx (btnPrev, btnNext)
         protected void btnPrev_Click(object sender, EventArgs e)
         {
             CurrentPage = Math.Max(1, CurrentPage - 1);
@@ -268,56 +189,109 @@ namespace tp_c_equipo_3B
             CargarProductosPaginados();
         }
 
-        // Si tenés referencias a nombres btnAnterior/btnSiguiente en otras páginas, dejo aliases que llaman a los handlers correctos
-        protected void btnAnterior_Click(object sender, EventArgs e)
+        protected void btnBuscar_Click(object sender, EventArgs e)
         {
-            btnPrev_Click(sender, e);
+            string filtro = txtBuscar.Text.ToLower();
+            var lista = articuloSQL.Listar();
+            var filtrados = lista.FindAll(x => x.Nombre.ToLower().Contains(filtro) || x.Codigo.ToLower().Contains(filtro));
+
+            var listaProcesada = filtrados.Select(art => {
+                string stockDisplay;
+                string stockClass;
+                int stock = art.StockActual;
+                if (stock == 0)
+                {
+                    stockDisplay = "Agotado";
+                    stockClass = "table-stock-status-out-of-stock";
+                }
+                else if (stock < art.StockMinimo)
+                {
+                    stockDisplay = "Poco Stock";
+                    stockClass = "table-stock-status-low-stock";
+                }
+                else
+                {
+                    stockDisplay = "En Stock";
+                    stockClass = "table-stock-status-in-stock";
+                }
+                decimal precioVenta = art.UltimoPrecioCompra * (1 + (art.PorcentajeGanancia / 100));
+
+                return new
+                {
+                    art.Id,
+                    art.Codigo,
+                    art.Nombre,
+                    art.Descripcion,
+                    art.IdMarca,
+                    art.IdCategoria,
+                    art.Marca,
+                    art.Categoria,
+                    art.UrlImagen,
+                    art.PorcentajeGanancia,
+                    art.StockMinimo,
+                    art.ProveedoresString,
+                    art.UltimoPrecioCompra,
+
+                    PrecioVenta = precioVenta,
+                    StockDisplay = stockDisplay,
+                    StockClass = stockClass
+                };
+            }).ToList();
+
+            gvProductos.DataSource = listaProcesada;
+            gvProductos.DataBind();
+
+            lblPaginado.Text = $"Mostrando {listaProcesada.Count} resultados";
+            lblPagina.Text = "1 / 1";
+            btnPrev.Enabled = false;
+            btnNext.Enabled = false;
         }
 
-        protected void btnSiguiente_Click(object sender, EventArgs e)
-        {
-            btnNext_Click(sender, e);
-        }
+        #endregion
+
+        #region "Eventos del Formulario (Guardar, Modificar, etc.)"
 
         protected void btnNuevo_Click(object sender, EventArgs e)
         {
             LimpiarFormulario();
             pnlFormulario.Visible = true;
             ViewState["IdEditar"] = null;
+
+            btnGuardar.Visible = true;
+            btnModificar.Visible = false;
         }
 
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             try
             {
+                string urlImagenPrincipal = ObtenerUrlImagenPrincipal(null);
                 Articulo nuevo = new Articulo
                 {
                     Codigo = txtCodigo.Text,
                     Nombre = txtNombre.Text,
                     Descripcion = txtDescripcion.Text,
-                    Precio = decimal.Parse(txtPrecio.Text),
+                    PorcentajeGanancia = decimal.Parse(txtPorcentajeGanancia.Text),
+                    StockMinimo = int.Parse(txtStockMinimo.Text),
                     IdMarca = int.Parse(ddlMarcaForm.SelectedValue),
-                    IdCategoria = int.Parse(ddlCategoriaForm.SelectedValue)
+                    IdCategoria = int.Parse(ddlCategoriaForm.SelectedValue),
+                    UrlImagen = urlImagenPrincipal,
+                    StockActual = int.Parse(txtStockActual.Text),
+                    UltimoPrecioCompra = decimal.Parse(txtUltimoPrecioCompra.Text)
                 };
-
                 int idGenerado = articuloSQL.AgregarYDevolverId(nuevo);
 
-                if (fuImagen.HasFile)
-                {
-                    string ruta = "~/Imagenes/" + fuImagen.FileName;
-                    fuImagen.SaveAs(Server.MapPath(ruta));
+                List<int> idsProveedores = ObtenerIdsProveedoresSeleccionados();
+                articuloProveedorSQL.ActualizarProveedores(idGenerado, idsProveedores);
 
-                    Imagen img = new Imagen
-                    {
-                        UrlImagen = ruta,
-                        IdArticulo = idGenerado
-                    };
-                    imagenSQL.Agregar(img, idGenerado);
-                }
+                ProcesarImagenesGaleria(idGenerado);
 
                 lblMensaje.Text = "Producto agregado correctamente.";
                 pnlFormulario.Visible = false;
                 InicializarPaginado();
+
+                btnGuardar.Visible = true;
+                btnModificar.Visible = true;
             }
             catch (Exception ex)
             {
@@ -330,21 +304,35 @@ namespace tp_c_equipo_3B
             try
             {
                 int id = (int)ViewState["IdEditar"];
+
+                string urlImagenPrincipal = ObtenerUrlImagenPrincipal(id);
                 Articulo art = new Articulo
                 {
                     Id = id,
                     Codigo = txtCodigo.Text,
                     Nombre = txtNombre.Text,
                     Descripcion = txtDescripcion.Text,
-                    Precio = decimal.Parse(txtPrecio.Text),
+                    PorcentajeGanancia = decimal.Parse(txtPorcentajeGanancia.Text),
+                    StockMinimo = int.Parse(txtStockMinimo.Text),
                     IdMarca = int.Parse(ddlMarcaForm.SelectedValue),
-                    IdCategoria = int.Parse(ddlCategoriaForm.SelectedValue)
+                    IdCategoria = int.Parse(ddlCategoriaForm.SelectedValue),
+                    UrlImagen = urlImagenPrincipal,
+                    StockActual = int.Parse(txtStockActual.Text),
+                    UltimoPrecioCompra = decimal.Parse(txtUltimoPrecioCompra.Text)
                 };
-
                 articuloSQL.Modificar(art);
+
+                List<int> idsProveedores = ObtenerIdsProveedoresSeleccionados();
+                articuloProveedorSQL.ActualizarProveedores(id, idsProveedores);
+
+                ProcesarImagenesGaleria(id);
+
                 lblMensaje.Text = "Producto modificado correctamente.";
                 pnlFormulario.Visible = false;
                 InicializarPaginado();
+
+                btnGuardar.Visible = true;
+                btnModificar.Visible = true;
             }
             catch (Exception ex)
             {
@@ -352,20 +340,164 @@ namespace tp_c_equipo_3B
             }
         }
 
+        protected void btnCancelar_Click(object sender, EventArgs e)
+        {
+            pnlFormulario.Visible = false;
+            lblMensaje.Text = "";
+
+            btnGuardar.Visible = true;
+            btnModificar.Visible = true;
+        }
+
+        protected void rblImagenTipo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (rblImagenTipo.SelectedValue == "URL")
+            {
+                pnlUrl.Visible = true;
+                pnlUpload.Visible = false;
+            }
+            else
+            {
+                pnlUrl.Visible = false;
+                pnlUpload.Visible = true;
+            }
+        }
+
+        #endregion
+
+        #region "Helpers de Lógica de Formulario"
+
+        private string ObtenerUrlImagenPrincipal(int? idArticuloExistente)
+        {
+            string urlParaGuardar = "";
+
+            if (rblImagenTipo.SelectedValue == "URL" && !string.IsNullOrEmpty(txtUrlImagen.Text))
+            {
+                urlParaGuardar = txtUrlImagen.Text;
+            }
+            else if (rblImagenTipo.SelectedValue == "UPLOAD" && fuImagen.HasFiles)
+            {
+                urlParaGuardar = fuImagen.PostedFiles[0].FileName;
+            }
+            else if (idArticuloExistente.HasValue)
+            {
+                Articulo artActual = articuloSQL.Listar().Find(x => x.Id == idArticuloExistente.Value);
+                if (artActual != null)
+                {
+                    urlParaGuardar = artActual.UrlImagen;
+                }
+            }
+            return urlParaGuardar;
+        }
+
+        private void ProcesarImagenesGaleria(int idArticulo)
+        {
+            if (rblImagenTipo.SelectedValue == "UPLOAD" && fuImagen.HasFiles)
+            {
+                if (ViewState["IdEditar"] != null)
+                {
+                    imagenSQL.EliminarPorArticulo(idArticulo);
+                }
+
+                foreach (HttpPostedFile postedFile in fuImagen.PostedFiles)
+                {
+                    string nombreArchivo = postedFile.FileName;
+                    string rutaLocal = Server.MapPath("~/Imagenes/" + nombreArchivo);
+
+                    postedFile.SaveAs(rutaLocal);
+
+                    Imagen img = new Imagen
+                    {
+                        UrlImagen = nombreArchivo,
+                        IdArticulo = idArticulo
+                    };
+                    imagenSQL.Agregar(img, idArticulo);
+                }
+            }
+        }
+
+        private List<int> ObtenerIdsProveedoresSeleccionados()
+        {
+            return cblProveedoresForm.Items.Cast<ListItem>()
+                                     .Where(li => li.Selected)
+                                     .Select(li => int.Parse(li.Value))
+                                     .ToList();
+        }
+
+        private void LimpiarFormulario()
+        {
+            txtCodigo.Text = "";
+            txtNombre.Text = "";
+            txtDescripcion.Text = "";
+            txtPorcentajeGanancia.Text = "";
+            txtStockMinimo.Text = "";
+            txtStockActual.Text = "0";
+            txtUltimoPrecioCompra.Text = "0";
+
+            if (ddlMarcaForm.Items.Count > 0) ddlMarcaForm.SelectedIndex = 0;
+            if (ddlCategoriaForm.Items.Count > 0) ddlCategoriaForm.SelectedIndex = 0;
+            cblProveedoresForm.ClearSelection();
+
+            rblImagenTipo.SelectedValue = "UPLOAD";
+            pnlUpload.Visible = true;
+            pnlUrl.Visible = false;
+            txtUrlImagen.Text = "";
+        }
+
+        #endregion
+
+        #region "Eventos de la Grilla (GridView)"
+
         protected void gvProductos_RowEditing(object sender, GridViewEditEventArgs e)
         {
             int id = Convert.ToInt32(gvProductos.DataKeys[e.NewEditIndex].Value);
             Articulo art = articuloSQL.Listar().Find(x => x.Id == id);
+            if (art == null) return;
+
 
             txtCodigo.Text = art.Codigo;
             txtNombre.Text = art.Nombre;
             txtDescripcion.Text = art.Descripcion;
-            txtPrecio.Text = art.Precio.ToString();
+
+            txtPorcentajeGanancia.Text = art.PorcentajeGanancia.ToString("N2");
+            txtStockMinimo.Text = art.StockMinimo.ToString();
+            txtStockActual.Text = art.StockActual.ToString();
+            txtUltimoPrecioCompra.Text = art.UltimoPrecioCompra.ToString("N2");
+
             ddlMarcaForm.SelectedValue = art.IdMarca.ToString();
             ddlCategoriaForm.SelectedValue = art.IdCategoria.ToString();
 
+            if (!string.IsNullOrEmpty(art.UrlImagen) && (art.UrlImagen.StartsWith("http") || art.UrlImagen.StartsWith("https")))
+            {
+                rblImagenTipo.SelectedValue = "URL";
+                pnlUrl.Visible = true;
+                pnlUpload.Visible = false;
+                txtUrlImagen.Text = art.UrlImagen;
+            }
+            else
+            {
+                rblImagenTipo.SelectedValue = "UPLOAD";
+                pnlUrl.Visible = false;
+                pnlUpload.Visible = true;
+                txtUrlImagen.Text = "";
+            }
+
+ 
+            cblProveedoresForm.ClearSelection();
+            List<int> idsProveedores = articuloProveedorSQL.ListarIdsPorArticulo(id);
+            foreach (ListItem li in cblProveedoresForm.Items)
+            {
+                li.Selected = idsProveedores.Contains(int.Parse(li.Value));
+            }
+
             ViewState["IdEditar"] = id;
             pnlFormulario.Visible = true;
+
+   
+            btnGuardar.Visible = false;
+            btnModificar.Visible = true;
+
+            e.Cancel = true;
         }
 
         protected void gvProductos_RowDeleting(object sender, GridViewDeleteEventArgs e)
@@ -373,8 +505,11 @@ namespace tp_c_equipo_3B
             try
             {
                 int id = Convert.ToInt32(gvProductos.DataKeys[e.RowIndex].Value);
+
+                articuloProveedorSQL.ActualizarProveedores(id, new List<int>());
                 imagenSQL.EliminarPorArticulo(id);
                 articuloSQL.Eliminar(id);
+
                 lblMensaje.Text = "Producto eliminado.";
                 InicializarPaginado();
             }
@@ -384,36 +519,6 @@ namespace tp_c_equipo_3B
             }
         }
 
-        protected void btnBuscar_Click(object sender, EventArgs e)
-        {
-            string filtro = txtBuscar.Text.ToLower();
-            var lista = articuloSQL.Listar();
-            var filtrados = lista.FindAll(x => x.Nombre.ToLower().Contains(filtro) || x.Codigo.ToLower().Contains(filtro));
-            gvProductos.DataSource = filtrados;
-            gvProductos.DataBind();
-            // Actualizar paginado visual si querés mantener consistencia:
-            lblPaginado.Text = $"Mostrando {filtrados.Count} resultados";
-            lblPagina.Text = "1 / 1";
-            btnPrev.Enabled = false;
-            btnNext.Enabled = false;
-        }
-
-        protected void btnCancelar_Click(object sender, EventArgs e)
-        {
-            pnlFormulario.Visible = false;
-            lblMensaje.Text = "";
-        }
-
-        private void LimpiarFormulario()
-        {
-            txtCodigo.Text = "";
-            txtNombre.Text = "";
-            txtDescripcion.Text = "";
-            txtPrecio.Text = "";
-            if (ddlMarcaForm.Items.Count > 0) ddlMarcaForm.SelectedIndex = 0;
-            if (ddlCategoriaForm.Items.Count > 0) ddlCategoriaForm.SelectedIndex = 0;
-        }
-
-
+        #endregion
     }
 }
