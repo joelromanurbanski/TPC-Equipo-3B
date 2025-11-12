@@ -33,7 +33,7 @@ namespace SQL
                     datos.ejecutarAccion();
 
                     // Descontar stock
-                    datos.setearConsulta("UPDATE Articulo SET StockActual = StockActual - @Cantidad WHERE Id = @IdArticulo");
+                    datos.setearConsulta("UPDATE ARTICULOS SET StockActual = StockActual - @Cantidad WHERE Id = @IdArticulo");
                     datos.setearParametro("@Cantidad", detalle.Cantidad);
                     datos.setearParametro("@IdArticulo", detalle.Articulo.Id);
                     datos.ejecutarAccion();

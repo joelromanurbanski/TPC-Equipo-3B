@@ -31,7 +31,7 @@ namespace SQL
                     datos.ejecutarAccion();
 
                     // Actualizar stock y precio
-                    datos.setearConsulta("UPDATE Articulo SET StockActual = StockActual + @Cantidad, Precio = @PrecioCompra WHERE Id = @IdArticulo");
+                    datos.setearConsulta("UPDATE ARTICULOS SET StockActual = StockActual + @Cantidad, Precio = @PrecioCompra WHERE Id = @IdArticulo");
                     datos.setearParametro("@Cantidad", detalle.Cantidad);
                     datos.setearParametro("@PrecioCompra", detalle.PrecioCompra);
                     datos.setearParametro("@IdArticulo", detalle.Articulo.Id);

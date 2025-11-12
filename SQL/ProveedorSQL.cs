@@ -16,7 +16,7 @@ namespace SQL
 
             try
             {
-                datos.setearConsulta("SELECT Id, Nombre, Email, Telefono, Direccion FROM Proveedor");
+                datos.setearConsulta("SELECT Id, Nombre, Email, Telefono, Direccion FROM PROVEEDORES");
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())
@@ -49,7 +49,7 @@ namespace SQL
 
             try
             {
-                datos.setearConsulta("INSERT INTO Proveedor (Nombre, Email, Telefono, Direccion) VALUES (@Nombre, @Email, @Telefono, @Direccion)");
+                datos.setearConsulta("INSERT INTO PROVEEDORES (Nombre, Email, Telefono, Direccion) VALUES (@Nombre, @Email, @Telefono, @Direccion)");
                 datos.setearParametro("@Nombre", proveedor.Nombre);
                 datos.setearParametro("@Email", proveedor.Email);
                 datos.setearParametro("@Telefono", proveedor.Telefono);
