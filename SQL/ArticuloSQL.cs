@@ -140,7 +140,6 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-      
         public List<Articulo> ListarPorProveedor(int idProveedor)
         {
             List<Articulo> lista = new List<Articulo>();
@@ -148,7 +147,7 @@ namespace SQL
 
             try
             {
-                
+               
                 datos.setearConsulta(@"
                 SELECT A.Id, Codigo, Nombre, A.Descripcion, 
                        A.UltimoPrecioCompra, A.PorcentajeGanancia, 

@@ -40,7 +40,6 @@ namespace SQL
 
             try
             {
-                 
                 datos.setearConsulta("INSERT INTO Proveedor (Nombre, Email, Telefono, Direccion) VALUES (@Nombre, @Email, @Telefono, @Direccion)");
                 datos.setearParametro("@Nombre", proveedor.Nombre);
                 datos.setearParametro("@Email", proveedor.Email);
@@ -80,11 +79,13 @@ namespace SQL
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                 datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdProveedor = @Id");
+                // borramos las relaciones
+                datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdProveedor = @Id");
                 datos.setearParametro("@Id", id);
                 datos.ejecutarAccion();
 
-                 datos.setearConsulta("DELETE FROM Proveedor WHERE Id = @Id");
+                // borramos al proveedor
+                datos.setearConsulta("DELETE FROM Proveedor WHERE Id = @Id");
                 datos.setearParametro("@Id", id);
                 datos.ejecutarAccion();
             }

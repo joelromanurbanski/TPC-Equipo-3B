@@ -8,7 +8,6 @@ namespace SQL
 {
     public class ArticuloProveedorSQL
     {
-         
         public List<int> ListarIdsPorArticulo(int idArticulo)
         {
             List<int> ids = new List<int>();
@@ -28,7 +27,6 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // --- ¡MÉTODO NUEVO AGREGADO! ---
         // Trae todos los IDs de artículos asociados a un proveedor
         public List<int> ListarIdsArticuloPorProveedor(int idProveedor)
         {

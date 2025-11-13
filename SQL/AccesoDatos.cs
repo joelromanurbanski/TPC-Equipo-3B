@@ -14,7 +14,7 @@ namespace SQL
         private SqlConnection conexion;
         private SqlCommand comando;
         private SqlDataReader lector;
-        private SqlTransaction transaccion;  
+        private SqlTransaction transaccion;
 
         public SqlDataReader Lector => lector;
 
@@ -23,8 +23,6 @@ namespace SQL
             conexion = new SqlConnection("server=.\\SQLEXPRESS; database=GestionNegocio; integrated security=true");
             comando = new SqlCommand();
         }
-
-        
         public void iniciarTransaccion()
         {
             try
@@ -49,16 +47,14 @@ namespace SQL
         {
             transaccion?.Rollback();
         }
-
-         public void cerrarConexionTransaccional()
+        public void cerrarConexionTransaccional()
         {
             lector?.Close();
-            transaccion = null; 
+            transaccion = null; // Limpiar la transacción
             if (conexion.State != System.Data.ConnectionState.Closed)
                 conexion.Close();
         }
 
- 
         public void setearConsulta(string consulta)
         {
             comando.CommandType = System.Data.CommandType.Text;
@@ -66,7 +62,8 @@ namespace SQL
             comando.Parameters.Clear();
             comando.Connection = conexion;
             if (transaccion != null)
-                comando.Transaction = transaccion; 
+                comando.Transaction = transaccion; // Asignar transacción si existe
+        }
 
         public void setearParametro(string nombre, object valor)
         {
@@ -127,7 +124,8 @@ namespace SQL
             catch { }
             finally
             {
-                 if (transaccion == null && conexion.State != System.Data.ConnectionState.Closed)
+                // No cerrar la conexión si estamos en una transacción
+                if (transaccion == null && conexion.State != System.Data.ConnectionState.Closed)
                     conexion.Close();
             }
         }

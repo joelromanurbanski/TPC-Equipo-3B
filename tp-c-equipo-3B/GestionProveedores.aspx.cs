@@ -31,7 +31,6 @@ namespace tp_c_equipo_3B
                 }
                 else
                 {
-                    // No hay ID, mostrar panel vacío
                     pnlVacio.Visible = true;
                     pnlDetalle.Visible = false;
                     pnlFormulario.Visible = false;
@@ -82,11 +81,10 @@ namespace tp_c_equipo_3B
                 {
                     pnlVacio.Visible = false;
                     pnlFormulario.Visible = false;
-                    pnlDetalle.Visible = true; // Mostrar detalles
+                    pnlDetalle.Visible = true;
 
                     ViewState["SelectedProveedorId"] = idProveedor;
 
-                    // Rellenar Pestaña "Datos Generales"
                     lblProveedorNombre.Text = p.Nombre;
                     lblCompanyName.Text = p.Nombre;
                     lblEmail.Text = p.Email ?? "N/A";
@@ -102,7 +100,7 @@ namespace tp_c_equipo_3B
             }
         }
 
-        // --- Eventos de Botones ---
+        // Botones
 
         protected void btnBuscarProveedorSidebar_Click(object sender, EventArgs e)
         {
@@ -145,8 +143,6 @@ namespace tp_c_equipo_3B
             }
         }
 
-        // --- ¡LÓGICA DE FORMULARIO NUEVA! ---
-
         private void LimpiarFormulario()
         {
             txtNombreForm.Text = "";
@@ -157,7 +153,7 @@ namespace tp_c_equipo_3B
 
         protected void btnNuevoProveedor_Click(object sender, EventArgs e)
         {
-            // Ocultar los otros paneles
+            // Ocultar paneles
             pnlVacio.Visible = false;
             pnlDetalle.Visible = false;
 
@@ -173,17 +169,13 @@ namespace tp_c_equipo_3B
         {
             if (ViewState["SelectedProveedorId"] == null) return;
 
-            // Ocultar los otros paneles
             pnlVacio.Visible = false;
             pnlDetalle.Visible = false;
-
-            // Mostrar el formulario en modo "Editar"
             pnlFormulario.Visible = true;
             litTitulo.Text = "Editar Proveedor";
             btnGuardar.Visible = false;
             btnModificar.Visible = true;
 
-            // Cargar datos
             try
             {
                 int id = (int)ViewState["SelectedProveedorId"];
@@ -198,7 +190,7 @@ namespace tp_c_equipo_3B
             }
             catch (Exception ex)
             {
-                // (Manejar error)
+
             }
         }
 
@@ -221,7 +213,7 @@ namespace tp_c_equipo_3B
                 }
                 catch (Exception ex)
                 {
-                    // (Manejar error)
+
                 }
             }
         }
@@ -243,11 +235,11 @@ namespace tp_c_equipo_3B
                     };
 
                     proveedorSQL.Modificar(modificado);
-                    Response.Redirect("GestionProveedores.aspx?id=" + id, false); // Volver al proveedor
+                    Response.Redirect("GestionProveedores.aspx?id=" + id, false); 
                 }
                 catch (Exception ex)
                 {
-                    // (Manejar error)
+
                 }
             }
         }
@@ -256,7 +248,7 @@ namespace tp_c_equipo_3B
         {
             pnlFormulario.Visible = false;
 
-            // Decidir qué panel mostrar
+ 
             if (ViewState["SelectedProveedorId"] != null)
             {
                 pnlDetalle.Visible = true;

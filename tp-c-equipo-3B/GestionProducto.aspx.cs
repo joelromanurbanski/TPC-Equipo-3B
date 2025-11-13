@@ -19,8 +19,6 @@ namespace tp_c_equipo_3B
         private ArticuloProveedorSQL articuloProveedorSQL = new ArticuloProveedorSQL();
 
         #region "Propiedades y Helpers de Página"
-
-        // Helper de imagen para la Grilla
         protected string GetImageSource(object url)
         {
             string imageUrl = url?.ToString();
@@ -116,36 +114,33 @@ namespace tp_c_equipo_3B
             ddlProveedorFilter.Enabled = true;
         }
 
-        // --- MÉTODO CENTRAL PARA CARGAR Y FILTRAR ---
+        // CARGAR Y FILTRAR
         private void BindGrid()
         {
-            // ¡CAMBIO IMPORTANTE!
-            // Cargar la lista directamente desde la BD cada vez.
-            // Se elimina la dependencia del ViewState.
             var listaFiltrada = articuloSQL.Listar();
 
-            // 1. Aplicar filtro de texto
+            // Aplicar filtro de texto
             string filtroTexto = txtBuscar.Text.Trim().ToLower();
             if (!string.IsNullOrEmpty(filtroTexto))
             {
                 listaFiltrada = listaFiltrada.Where(a => a.Nombre.ToLower().Contains(filtroTexto) || a.Codigo.ToLower().Contains(filtroTexto)).ToList();
             }
 
-            // 2. Aplicar filtro de Categoría
+            // Aplicar filtro de Categoría
             int idCategoria = int.Parse(ddlCategoriaForm.SelectedValue);
             if (idCategoria > 0)
             {
                 listaFiltrada = listaFiltrada.Where(a => a.IdCategoria == idCategoria).ToList();
             }
 
-            // 3. Aplicar filtro de Marca
+            // Aplicar filtro de Marca
             int idMarca = int.Parse(ddlMarcaForm.SelectedValue);
             if (idMarca > 0)
             {
                 listaFiltrada = listaFiltrada.Where(a => a.IdMarca == idMarca).ToList();
             }
 
-            // 4. Aplicar filtro de Stock
+            // Aplicar filtro de Stock
             string stockFiltro = ddlStockFilter.SelectedValue;
             if (stockFiltro != "Todos")
             {
@@ -157,7 +152,7 @@ namespace tp_c_equipo_3B
                 }).ToList();
             }
 
-            // 5. Aplicar filtro de Proveedor
+            // Aplicar filtro de Proveedor
             int idProveedor = int.Parse(ddlProveedorFilter.SelectedValue);
             if (idProveedor > 0)
             {
@@ -165,7 +160,6 @@ namespace tp_c_equipo_3B
                 listaFiltrada = listaFiltrada.Where(a => idsArticulosDelProveedor.Contains(a.Id)).ToList();
             }
 
-            // Proyectamos la lista FILTRADA a un ViewModel anónimo para la grilla
             var listaProcesada = listaFiltrada.Select(art => {
                 string stockDisplay;
                 string stockClass;
@@ -210,11 +204,11 @@ namespace tp_c_equipo_3B
                 };
             }).ToList();
 
-            // Aplicar paginación a la lista PROCESADA
+
             gvProductos.DataSource = listaProcesada;
             gvProductos.DataBind();
 
-            // Actualizar etiquetas de paginado
+            // Actualizar etiquetas
             int totalItems = listaProcesada.Count;
             int totalPages = gvProductos.PageCount;
             if (totalPages == 0) totalPages = 1;
@@ -227,7 +221,7 @@ namespace tp_c_equipo_3B
             btnNext.Enabled = !gvProductos.PageIndex.Equals(totalPages - 1);
         }
 
-        // --- Eventos de Paginado y Filtros ---
+        // Filtros
 
         protected void btnPrev_Click(object sender, EventArgs e)
         {
@@ -399,7 +393,7 @@ namespace tp_c_equipo_3B
             }
             else if (idArticuloExistente.HasValue)
             {
-                // ¡CAMBIO IMPORTANTE! Cargar la lista fresca para buscar
+                // Cargar la lista fresca para buscar
                 Articulo artActual = articuloSQL.Listar().Find(x => x.Id == idArticuloExistente.Value);
                 if (artActual != null)
                 {
@@ -471,7 +465,7 @@ namespace tp_c_equipo_3B
         {
             int id = Convert.ToInt32(gvProductos.DataKeys[e.NewEditIndex].Value);
 
-            // ¡CAMBIO IMPORTANTE! Cargar la lista fresca para buscar
+            // Cargar la lista para buscar
             Articulo art = articuloSQL.Listar().Find(x => x.Id == id);
             if (art == null) return;
 

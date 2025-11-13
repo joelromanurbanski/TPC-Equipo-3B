@@ -9,7 +9,8 @@ namespace tp_c_equipo_3B
 {
     public class BundleConfig
     {
-         public static void RegisterBundles(BundleCollection bundles)
+        // Para obtener más información sobre las uniones, visite https://go.microsoft.com/fwlink/?LinkID=303951
+        public static void RegisterBundles(BundleCollection bundles)
         {
             RegisterJQueryScriptManager();
 
@@ -23,13 +24,15 @@ namespace tp_c_equipo_3B
                             "~/Scripts/WebForms/TreeView.js",
                             "~/Scripts/WebForms/WebParts.js"));
 
-             bundles.Add(new ScriptBundle("~/bundles/MsAjaxJs").Include(
+            // El orden es muy importante para el funcionamiento de estos archivos ya que tienen dependencias explícitas
+            bundles.Add(new ScriptBundle("~/bundles/MsAjaxJs").Include(
                     "~/Scripts/WebForms/MsAjax/MicrosoftAjax.js",
                     "~/Scripts/WebForms/MsAjax/MicrosoftAjaxApplicationServices.js",
                     "~/Scripts/WebForms/MsAjax/MicrosoftAjaxTimer.js",
                     "~/Scripts/WebForms/MsAjax/MicrosoftAjaxWebForms.js"));
 
-            
+            // Use la versión de desarrollo de Modernizr para desarrollar y aprender. Luego, cuando esté listo
+            // para la producción, use la herramienta de compilación disponible en https://modernizr.com para seleccionar solo las pruebas que necesite
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                             "~/Scripts/modernizr-*"));
         }

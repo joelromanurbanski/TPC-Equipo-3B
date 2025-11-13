@@ -10,78 +10,89 @@ namespace SQL
 {
     public class ClienteSQL
     {
-        private AccesoDatos datos = new AccesoDatos();
-
-        public bool DniExiste(string dni)
+        public List<Cliente> Listar()
         {
+            List<Cliente> lista = new List<Cliente>();
+            AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("SELECT COUNT(*) FROM Clientes WHERE Documento = @dni");
-                datos.setearParametro("@dni", dni);
-                object result = datos.ejecutarEscalar();
-                return Convert.ToInt32(result) > 0;
-            }
-            finally { datos.cerrarConexion(); }
-        }
-
-        public void AgregarCliente(string dni, string nombre, string apellido, string email, string direccion, string ciudad, int cp)
-        {
-            try
-            {
-                datos.setearConsulta(@"INSERT INTO Clientes 
-                    (Documento, Nombre, Apellido, Email, Direccion, Ciudad, CP) 
-                    VALUES (@dni, @nombre, @apellido, @correo, @direccion, @ciudad, @cp)");
-
-                datos.setearParametro("@dni", dni);
-                datos.setearParametro("@nombre", nombre);
-                datos.setearParametro("@apellido", apellido);
-                datos.setearParametro("@correo", email);
-                datos.setearParametro("@direccion", direccion);
-                datos.setearParametro("@ciudad", ciudad);
-                datos.setearParametro("@cp", cp);
-
-                datos.ejecutarAccion();
-            }
-            finally { datos.cerrarConexion(); }
-        }
-
-        public Cliente PrellenarDatos(string dni)
-        {
-            Cliente cliente = null;
-            try
-            {
-                datos.setearConsulta("SELECT * FROM Clientes WHERE Documento = @dni");
-                datos.setearParametro("@dni", dni);
+                
+                datos.setearConsulta("SELECT Id, Documento, Nombre, Apellido, Email, Telefono, Direccion, Ciudad, CP FROM Cliente");
                 datos.ejecutarLectura();
-
-                if (datos.Lector.Read())
+                while (datos.Lector.Read())
                 {
-                    cliente = new Cliente
+                    lista.Add(new Cliente
                     {
                         Id = (int)datos.Lector["Id"],
                         Documento = datos.Lector["Documento"].ToString(),
                         Nombre = datos.Lector["Nombre"].ToString(),
                         Apellido = datos.Lector["Apellido"].ToString(),
-                        Email = datos.Lector["Email"].ToString(),
-                        Direccion = datos.Lector["Direccion"].ToString(),
-                        Ciudad = datos.Lector["Ciudad"].ToString(),
-                        CP = (int)datos.Lector["CP"]
-                    };
+                        Email = datos.Lector["Email"]?.ToString(),
+                        Telefono = datos.Lector["Telefono"]?.ToString(),
+                        Direccion = datos.Lector["Direccion"]?.ToString(),
+                        Ciudad = datos.Lector["Ciudad"]?.ToString(),
+                        CP = datos.Lector["CP"] != DBNull.Value ? (int)datos.Lector["CP"] : 0
+                    });
                 }
+                return lista;
             }
+            catch (Exception ex) { throw ex; }
             finally { datos.cerrarConexion(); }
-            return cliente;
         }
 
-        public int ObtenerIdCliente(string dni)
+        public void Agregar(Cliente nuevo)
         {
+            AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("SELECT Id FROM Clientes WHERE Documento = @dni");
-                datos.setearParametro("@dni", dni);
-                object result = datos.ejecutarEscalar();
-                return result != null ? Convert.ToInt32(result) : 0;
+                
+                datos.setearConsulta("INSERT INTO Cliente (Documento, Nombre, Apellido, Email, Telefono, Direccion, Ciudad, CP) VALUES (@Doc, @Nombre, @Apellido, @Email, @Tel, @Dir, @Ciudad, @CP)");
+                datos.setearParametro("@Doc", nuevo.Documento);
+                datos.setearParametro("@Nombre", nuevo.Nombre);
+                datos.setearParametro("@Apellido", nuevo.Apellido);
+                datos.setearParametro("@Email", nuevo.Email);
+                datos.setearParametro("@Tel", nuevo.Telefono);
+                datos.setearParametro("@Dir", nuevo.Direccion);
+                datos.setearParametro("@Ciudad", nuevo.Ciudad);
+                datos.setearParametro("@CP", nuevo.CP);
+                datos.ejecutarAccion();
             }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
+        }
+
+        public void Modificar(Cliente cliente)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                
+                datos.setearConsulta("UPDATE Cliente SET Documento=@Doc, Nombre=@Nombre, Apellido=@Apellido, Email=@Email, Telefono=@Tel, Direccion=@Dir, Ciudad=@Ciudad, CP=@CP WHERE Id=@Id");
+                datos.setearParametro("@Id", cliente.Id);
+                datos.setearParametro("@Doc", cliente.Documento);
+                datos.setearParametro("@Nombre", cliente.Nombre);
+                datos.setearParametro("@Apellido", cliente.Apellido);
+                datos.setearParametro("@Email", cliente.Email);
+                datos.setearParametro("@Tel", cliente.Telefono);
+                datos.setearParametro("@Dir", cliente.Direccion);
+                datos.setearParametro("@Ciudad", cliente.Ciudad);
+                datos.setearParametro("@CP", cliente.CP);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
+        }
+
+        public void Eliminar(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearConsulta("DELETE FROM Cliente WHERE Id = @Id");
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex) { throw ex; }
             finally { datos.cerrarConexion(); }
         }
     }
