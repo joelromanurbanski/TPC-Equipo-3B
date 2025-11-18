@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dominio
 {
+    [Serializable]
     public class Venta
     {
         public int Id { get; set; }
@@ -13,15 +14,17 @@ namespace Dominio
         public Cliente Cliente { get; set; }
         public string NumeroFactura { get; set; }
         public List<DetalleVenta> Detalles { get; set; }
+        public decimal TotalVenta { get; set; }
     }
 
+    [Serializable]
     public class DetalleVenta
     {
         public int Id { get; set; }
         public Articulo Articulo { get; set; }
         public int Cantidad { get; set; }
         public decimal PrecioUnitario { get; set; }
-        public decimal Subtotal { get; set; }
+        public decimal Subtotal { get; set; } // Esta propiedad la calculamos y asignamos en el .cs
+        public int ArticuloId => Articulo.Id;
     }
-
 }

@@ -188,5 +188,46 @@ namespace SQL
             catch (Exception ex) { throw ex; }
             finally { datos.cerrarConexion(); }
         }
+
+        public Articulo GetById(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+
+                datos.setearConsulta(@"
+            SELECT Id, Codigo, Nombre, Descripcion, 
+                   UltimoPrecioCompra, PorcentajeGanancia, 
+                   StockActual, StockMinimo,
+                   IdMarca, IdCategoria, UrlImagen
+            FROM Articulo
+            WHERE Id = @Id");
+
+                datos.setearParametro("@Id", id);
+                datos.ejecutarLectura();
+
+                if (datos.Lector.Read())
+                {
+                    Articulo art = new Articulo
+                    {
+                        Id = (int)datos.Lector["Id"],
+                        Codigo = datos.Lector["Codigo"].ToString(),
+                        Nombre = datos.Lector["Nombre"].ToString(),
+                        Descripcion = datos.Lector["Descripcion"].ToString(),
+                        UltimoPrecioCompra = datos.Lector["UltimoPrecioCompra"] != DBNull.Value ? (decimal)datos.Lector["UltimoPrecioCompra"] : 0,
+                        PorcentajeGanancia = datos.Lector["PorcentajeGanancia"] != DBNull.Value ? (decimal)datos.Lector["PorcentajeGanancia"] : 0,
+                        StockActual = datos.Lector["StockActual"] != DBNull.Value ? (int)datos.Lector["StockActual"] : 0,
+                        StockMinimo = datos.Lector["StockMinimo"] != DBNull.Value ? (int)datos.Lector["StockMinimo"] : 0,
+                        IdMarca = datos.Lector["IdMarca"] != DBNull.Value ? (int)datos.Lector["IdMarca"] : 0,
+                        IdCategoria = datos.Lector["IdCategoria"] != DBNull.Value ? (int)datos.Lector["IdCategoria"] : 0,
+                        UrlImagen = datos.Lector["UrlImagen"] != DBNull.Value ? datos.Lector["UrlImagen"].ToString() : ""
+                    };
+                    return art;
+                }
+                return null;
+            }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
+        }
     }
 }

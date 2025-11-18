@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dominio
 {
+    [Serializable]
     public class Articulo
     {
         public Articulo()

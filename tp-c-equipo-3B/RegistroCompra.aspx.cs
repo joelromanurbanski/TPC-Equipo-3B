@@ -4,180 +4,215 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Dominio;
+using SQL;
 
 namespace tp_c_equipo_3B
 {
     public partial class RegistroCompra : System.Web.UI.Page
     {
-        
-        
-            // Modelo simple para las filas de productos en la compra
-            [Serializable]
-            public class CompraItem
+        private ProveedorSQL proveedorSQL = new ProveedorSQL();
+        private ArticuloSQL articuloSQL = new ArticuloSQL();
+        private CompraSQL compraSQL = new CompraSQL();
+
+        // ViewState
+        private const string ViewStateKey_Items = "Compra_Items";
+        // Impuesto
+        private const decimal ImpuestoPorcentaje = 0.21m;
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
             {
-                public int IdProducto { get; set; }
-                public string Nombre { get; set; }
-                public int Cantidad { get; set; }
-                public decimal PrecioUnitario { get; set; }
-                public decimal Subtotal => Cantidad * PrecioUnitario;
+                InicializarPagina();
+            }
+        }
+
+        private void InicializarPagina()
+        {
+            
+            ViewState[ViewStateKey_Items] = new List<DetalleCompra>();
+
+           
+            CargarProveedores();
+            CargarArticulos();
+
+            // Fecha de hoy
+            txtFecha.Text = DateTime.Now.ToString("yyyy-MM-dd");
+
+            
+            ActualizarGridYTotales();
+        }
+
+        private void CargarProveedores()
+        {
+            ddlProveedor.DataSource = proveedorSQL.Listar();
+            ddlProveedor.DataTextField = "Nombre";
+            ddlProveedor.DataValueField = "Id";
+            ddlProveedor.DataBind();
+            ddlProveedor.Items.Insert(0, new ListItem("Seleccionar proveedor", "0"));
+        }
+
+        private void CargarArticulos()
+        {
+            ddlArticulo.DataSource = articuloSQL.Listar();
+            ddlArticulo.DataTextField = "Nombre";
+            ddlArticulo.DataValueField = "Id";
+            ddlArticulo.DataBind();
+            ddlArticulo.Items.Insert(0, new ListItem("Seleccionar producto", "0"));
+        }
+
+        protected void btnAgregarProducto_Click(object sender, EventArgs e)
+        {
+            // Validaciones
+            if (ddlArticulo.SelectedValue == "0")
+            {
+                MostrarMensaje("Debe seleccionar un producto.");
+                return;
+            }
+            if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad <= 0)
+            {
+                MostrarMensaje("La cantidad debe ser un número mayor a 0.");
+                return;
+            }
+            if (!decimal.TryParse(txtPrecioCompraUnitario.Text, out decimal precio) || precio <= 0)
+            {
+                MostrarMensaje("El precio de costo debe ser un número mayor a 0.");
+                return;
             }
 
-            private const string ViewStateKey_Items = "Compra_Items";
-            private const decimal ImpuestoPorcentaje = 0.18m; // 18%
+            // Cargar lista ViewState
+            var items = (List<DetalleCompra>)ViewState[ViewStateKey_Items];
+            int idArticulo = int.Parse(ddlArticulo.SelectedValue);
 
-            protected void Page_Load(object sender, EventArgs e)
+            // Verificar si el producto ya está en la lista
+            var existente = items.FirstOrDefault(x => x.Articulo.Id == idArticulo);
+
+            if (existente != null)
             {
-                if (!IsPostBack)
-                {
-                    InicializarPagina();
-                }
+                // Si existe, actualizar cantidad y precio
+                existente.Cantidad += cantidad;
+                existente.PrecioCompra = precio;
             }
-
-            private void InicializarPagina()
+            else
             {
-                // Inicializa la lista en ViewState
-                if (ViewState[ViewStateKey_Items] == null)
-                    ViewState[ViewStateKey_Items] = new List<CompraItem>();
-
-                // Inicializar controles si existen (si adaptás .aspx a controles servidor)
-                // Ejemplo: ddlProveedor.DataSource = proveedorSQL.Listar(); ddlProveedor.DataBind();
-                ActualizarGridYTotales();
-            }
-
-            // Invocado por un botón "Agregar" que toma valores de búsqueda / selección
-            protected void btnAgregar_Click(object sender, EventArgs e)
-            {
-                var items = (List<CompraItem>)ViewState[ViewStateKey_Items];
-
-                // Ejemplo: obtener producto seleccionado desde un input o control;
-                // aquí asumo que pasás IdProducto, Nombre, Cantidad y PrecioUnitario desde la UI.
-                // Reemplazá estas lecturas por las IDs reales de tus controles.
-                int idProducto = 0;
-                string nombre = Request.Form["inputProductoNombre"] ?? "Producto sin nombre";
-                int cantidad = int.TryParse(Request.Form["inputCantidad"], out var c) ? c : 1;
-                decimal precio = decimal.TryParse(Request.Form["inputPrecio"], out var p) ? p : 0m;
-
-                var existente = items.FirstOrDefault(x => x.IdProducto == idProducto && x.Nombre == nombre);
-                if (existente != null)
+                // Si no existe, crear el nuevo DetalleCompra
+                DetalleCompra nuevoItem = new DetalleCompra
                 {
-                    existente.Cantidad += cantidad;
-                    existente.PrecioUnitario = precio;
-                }
-                else
-                {
-                    items.Add(new CompraItem
+                    Articulo = new Articulo
                     {
-                        IdProducto = idProducto,
-                        Nombre = nombre,
-                        Cantidad = cantidad,
-                        PrecioUnitario = precio
-                    });
+                        Id = idArticulo,
+                        Nombre = ddlArticulo.SelectedItem.Text
+                    },
+                    Cantidad = cantidad,
+                    PrecioCompra = precio
+                };
+                items.Add(nuevoItem);
+            }
+
+            // Guardar lista en ViewState y actualizar UI
+            ViewState[ViewStateKey_Items] = items;
+            ActualizarGridYTotales();
+
+            // Limpiar campos de agregado
+            ddlArticulo.SelectedIndex = 0;
+            txtCantidad.Text = "1";
+            txtPrecioCompraUnitario.Text = "0";
+            lblMensaje.Visible = false;
+        }
+
+        protected void gvProductos_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "Eliminar")
+            {
+                int idArticulo = Convert.ToInt32(e.CommandArgument);
+                var items = (List<DetalleCompra>)ViewState[ViewStateKey_Items];
+
+                var itemParaEliminar = items.FirstOrDefault(x => x.ArticuloId == idArticulo);
+                if (itemParaEliminar != null)
+                {
+                    items.Remove(itemParaEliminar);
                 }
 
                 ViewState[ViewStateKey_Items] = items;
                 ActualizarGridYTotales();
             }
+        }
 
-            // Handler para eliminar una fila (si usás GridView delete)
-            protected void gvProductos_RowCommand(object sender, GridViewCommandEventArgs e)
+        protected void btnGuardarCompra_Click(object sender, EventArgs e)
+        {
+            if (!Page.IsValid) return;
+
+            var items = (List<DetalleCompra>)ViewState[ViewStateKey_Items];
+            if (items == null || items.Count == 0)
             {
-                if (e.CommandName == "Eliminar")
+                MostrarMensaje("Debe agregar al menos un producto a la compra.");
+                return;
+            }
+
+            try
+            {
+                // Crear el objeto Compra 
+                Compra nuevaCompra = new Compra
                 {
-                    int index = Convert.ToInt32(e.CommandArgument);
-                    var items = (List<CompraItem>)ViewState[ViewStateKey_Items];
-                    if (index >= 0 && index < items.Count)
-                    {
-                        items.RemoveAt(index);
-                        ViewState[ViewStateKey_Items] = items;
-                        ActualizarGridYTotales();
-                    }
-                }
+                    Proveedor = new Proveedor { Id = int.Parse(ddlProveedor.SelectedValue) },
+                    Fecha = DateTime.Parse(txtFecha.Text),
+                    Detalles = items, 
+                    TotalCompra = decimal.Parse(lblTotal.Text, System.Globalization.NumberStyles.Currency)
+                };
+
+                // Llamar  SQL
+                compraSQL.RegistrarCompra(nuevaCompra);
+
+                // Limpiar
+                InicializarPagina();
+                MostrarMensaje("¡Compra registrada con éxito! El stock y los precios de costo han sido actualizados.", true);
             }
-
-            // Guarda la compra: validaciones básicas y persistencia mínima (adaptar a tu capa SQL)
-            protected void btnGuardar_Click(object sender, EventArgs e)
+            catch (Exception ex)
             {
-                try
-                {
-                    var items = (List<CompraItem>)ViewState[ViewStateKey_Items];
-                    if (items == null || items.Count == 0)
-                    {
-                        MostrarMensaje("Agregá al menos un producto antes de guardar.");
-                        return;
-                    }
-
-                    // Lectura de campos (adaptá nombres de controles)
-                    string proveedor = Request.Form["ddlProveedor"] ?? "";
-                    string numeroFactura = Request.Form["txtNumeroFactura"] ?? "";
-                    DateTime fechaCompra = DateTime.TryParse(Request.Form["inputFecha"], out var f) ? f : DateTime.Now;
-                    decimal otrosCostos = decimal.TryParse(Request.Form["inputOtrosCostos"], out var oc) ? oc : 0m;
-
-                    decimal subtotal = items.Sum(i => i.Subtotal);
-                    decimal impuestos = Math.Round(subtotal * ImpuestoPorcentaje, 2);
-                    decimal total = subtotal + impuestos + otrosCostos;
-
-                    // Aquí llamá a tu capa SQL para persistir la compra y sus líneas.
-                    // Ejemplo conceptual:
-                    // int idCompra = compraSQL.CrearCompra(proveedor, numeroFactura, fechaCompra, subtotal, impuestos, otrosCostos, total);
-                    // foreach (var it in items) compraSQL.AgregarLinea(idCompra, it.IdProducto, it.Cantidad, it.PrecioUnitario);
-
-                    // Simulación: limpiar y volver a inicializar
-                    ViewState[ViewStateKey_Items] = new List<CompraItem>();
-                    ActualizarGridYTotales();
-                    MostrarMensaje("Compra guardada correctamente.");
-                }
-                catch (Exception ex)
-                {
-                    MostrarMensaje("Error al guardar la compra: " + ex.Message);
-                }
-            }
-
-            protected void btnCancelar_Click(object sender, EventArgs e)
-            {
-                // Limpiar formulario y lista
-                ViewState[ViewStateKey_Items] = new List<CompraItem>();
-                ActualizarGridYTotales();
-                // Opcional: limpiar inputs mediante Request/Form o controles server
-            }
-
-            // Calcula totales y refresca la grilla (si usás GridView, enlazalo aquí)
-            private void ActualizarGridYTotales()
-            {
-                var items = (List<CompraItem>)ViewState[ViewStateKey_Items] ?? new List<CompraItem>();
-
-                decimal subtotal = items.Sum(i => i.Subtotal);
-                decimal impuestos = Math.Round(subtotal * ImpuestoPorcentaje, 2);
-
-                // Leer otros costos desde form si existe
-                decimal otrosCostos = decimal.TryParse(Request.Form["inputOtrosCostos"], out var oc) ? oc : 0m;
-
-                decimal total = subtotal + impuestos + otrosCostos;
-
-                // Si tenés controles server, actualizalos. Ejemplos (descomentar si existen en .aspx):
-                // gvProductos.DataSource = items;
-                // gvProductos.DataBind();
-                // lblSubtotal.Text = subtotal.ToString("C");
-                // lblImpuestos.Text = impuestos.ToString("C");
-                // txtOtrosCostos.Text = otrosCostos.ToString("N2");
-                // lblTotal.Text = total.ToString("C");
-
-                // Si no tenés controles server, podés guardar valores en ViewState para que la UI los lea por script
-                ViewState["Compra_Subtotal"] = subtotal;
-                ViewState["Compra_Impuestos"] = impuestos;
-                ViewState["Compra_Otros"] = otrosCostos;
-                ViewState["Compra_Total"] = total;
-            }
-
-            // Mensajería simple: adaptar a control label en la UI
-            private void MostrarMensaje(string texto)
-            {
-                // Si tenés un Label server llamado lblMensaje:
-                // lblMensaje.Text = texto;
-                // lblMensaje.Visible = true;
-
-                // Alternativa: almacenar en ViewState para mostrar con JS en la página
-                ViewState["Compra_Mensaje"] = texto;
+                MostrarMensaje("Error al guardar la compra: " + ex.Message);
             }
         }
-    }
 
+        protected void btnCancelarCompra_Click(object sender, EventArgs e)
+        {
+            InicializarPagina();
+            lblMensaje.Visible = false;
+        }
+
+        protected void txtOtrosCostos_TextChanged(object sender, EventArgs e)
+        {
+            // Calcular totales si hay costos adicionales
+            ActualizarGridYTotales();
+        }
+
+        private void ActualizarGridYTotales()
+        {
+            var items = (List<DetalleCompra>)ViewState[ViewStateKey_Items];
+
+            
+            gvProductos.DataSource = items;
+            gvProductos.DataBind();
+
+            // Calcular totales
+            decimal subtotal = items.Sum(i => i.Subtotal);
+            decimal impuestos = Math.Round(subtotal * ImpuestoPorcentaje, 2);
+            decimal otrosCostos = 0;
+            decimal.TryParse(txtOtrosCostos.Text, out otrosCostos);
+
+            decimal total = subtotal + impuestos + otrosCostos;
+
+            // Actualizar Labels del resumen
+            lblSubtotal.Text = subtotal.ToString("C"); // "C" = Formato Moneda
+            lblImpuestos.Text = impuestos.ToString("C");
+            lblTotal.Text = total.ToString("C");
+        }
+
+        private void MostrarMensaje(string texto, bool exito = false)
+        {
+            lblMensaje.Text = texto;
+            lblMensaje.CssClass = exito ? "alert alert-success" : "alert alert-danger";
+            lblMensaje.Visible = true;
+        }
+    }
+}
