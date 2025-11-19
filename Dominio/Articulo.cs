@@ -28,12 +28,11 @@ namespace Dominio
         public int IdCategoria { get; set; }
         public virtual Marca Marca { get; set; }
         public virtual Categoria Categoria { get; set; }
-        public string UrlImagen { get; set; }  // Imagen principal
+        public string UrlImagen { get; set; }  
         public virtual ICollection<Imagen> Imagenes { get; set; }
         public virtual ICollection<Proveedor> Proveedores { get; set; }
 
-        // Propiedad ViewModel para la grilla
-        // (Transporta el string de proveedores desde SQL)
+        
         public string ProveedoresString { get; set; }
         public string FirstImage()
         {

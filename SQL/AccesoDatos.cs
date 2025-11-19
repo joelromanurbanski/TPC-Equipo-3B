@@ -50,7 +50,7 @@ namespace SQL
         public void cerrarConexionTransaccional()
         {
             lector?.Close();
-            transaccion = null; // Limpiar la transacción
+            transaccion = null;  
             if (conexion.State != System.Data.ConnectionState.Closed)
                 conexion.Close();
         }
@@ -62,7 +62,7 @@ namespace SQL
             comando.Parameters.Clear();
             comando.Connection = conexion;
             if (transaccion != null)
-                comando.Transaction = transaccion; // Asignar transacción si existe
+                comando.Transaction = transaccion;  
         }
 
         public void setearParametro(string nombre, object valor)
@@ -124,8 +124,7 @@ namespace SQL
             catch { }
             finally
             {
-                // No cerrar la conexión si estamos en una transacción
-                if (transaccion == null && conexion.State != System.Data.ConnectionState.Closed)
+                 if (transaccion == null && conexion.State != System.Data.ConnectionState.Closed)
                     conexion.Close();
             }
         }

@@ -46,15 +46,11 @@ namespace tp_c_equipo_3B
         {
             if (!IsPostBack)
             {
-                // Cargar listas de SQL
                 CargarMarcas();
                 CargarCategorias();
                 CargarProveedores();
-
-                // Cargar la grilla
-                gvProductos.PageIndex = 0; // Iniciar en la página 0
+                gvProductos.PageIndex = 0;
                 BindGrid();
-
                 pnlFormulario.Visible = false;
             }
         }
@@ -62,15 +58,12 @@ namespace tp_c_equipo_3B
         private void CargarMarcas()
         {
             var lista = marcaSQL.Listar();
-
-            // Cargar filtro
             ddlMarcaForm.DataSource = lista;
             ddlMarcaForm.DataTextField = "Descripcion";
             ddlMarcaForm.DataValueField = "Id";
             ddlMarcaForm.DataBind();
             ddlMarcaForm.Items.Insert(0, new ListItem("Todas", "0"));
 
-            // Cargar formulario
             ddlMarcaForm_Form.DataSource = lista;
             ddlMarcaForm_Form.DataTextField = "Descripcion";
             ddlMarcaForm_Form.DataValueField = "Id";
@@ -81,15 +74,12 @@ namespace tp_c_equipo_3B
         private void CargarCategorias()
         {
             var lista = categoriaSQL.Listar();
-
-            // Cargar filtro
             ddlCategoriaForm.DataSource = lista;
             ddlCategoriaForm.DataTextField = "Descripcion";
             ddlCategoriaForm.DataValueField = "Id";
             ddlCategoriaForm.DataBind();
             ddlCategoriaForm.Items.Insert(0, new ListItem("Todas", "0"));
 
-            // Cargar formulario
             ddlCategoriaForm_Form.DataSource = lista;
             ddlCategoriaForm_Form.DataTextField = "Descripcion";
             ddlCategoriaForm_Form.DataValueField = "Id";
@@ -100,7 +90,6 @@ namespace tp_c_equipo_3B
         private void CargarProveedores()
         {
             var proveedores = proveedorSQL.Listar();
-
             cblProveedoresForm.DataSource = proveedores;
             cblProveedoresForm.DataTextField = "Nombre";
             cblProveedoresForm.DataValueField = "Id";
@@ -114,33 +103,28 @@ namespace tp_c_equipo_3B
             ddlProveedorFilter.Enabled = true;
         }
 
-        // CARGAR Y FILTRAR
         private void BindGrid()
         {
             var listaFiltrada = articuloSQL.Listar();
 
-            // Aplicar filtro de texto
             string filtroTexto = txtBuscar.Text.Trim().ToLower();
             if (!string.IsNullOrEmpty(filtroTexto))
             {
                 listaFiltrada = listaFiltrada.Where(a => a.Nombre.ToLower().Contains(filtroTexto) || a.Codigo.ToLower().Contains(filtroTexto)).ToList();
             }
 
-            // Aplicar filtro de Categoría
             int idCategoria = int.Parse(ddlCategoriaForm.SelectedValue);
             if (idCategoria > 0)
             {
                 listaFiltrada = listaFiltrada.Where(a => a.IdCategoria == idCategoria).ToList();
             }
 
-            // Aplicar filtro de Marca
             int idMarca = int.Parse(ddlMarcaForm.SelectedValue);
             if (idMarca > 0)
             {
                 listaFiltrada = listaFiltrada.Where(a => a.IdMarca == idMarca).ToList();
             }
 
-            // Aplicar filtro de Stock
             string stockFiltro = ddlStockFilter.SelectedValue;
             if (stockFiltro != "Todos")
             {
@@ -152,7 +136,6 @@ namespace tp_c_equipo_3B
                 }).ToList();
             }
 
-            // Aplicar filtro de Proveedor
             int idProveedor = int.Parse(ddlProveedorFilter.SelectedValue);
             if (idProveedor > 0)
             {
@@ -167,17 +150,17 @@ namespace tp_c_equipo_3B
 
                 if (stock == 0)
                 {
-                    stockDisplay = "Agotado";
+                    stockDisplay = $"Agotado ({stock})";
                     stockClass = "table-stock-status-out-of-stock";
                 }
                 else if (stock < art.StockMinimo)
                 {
-                    stockDisplay = "Poco Stock";
+                    stockDisplay = $"Poco Stock ({stock})";
                     stockClass = "table-stock-status-low-stock";
                 }
                 else
                 {
-                    stockDisplay = "En Stock";
+                    stockDisplay = $"En Stock ({stock})";
                     stockClass = "table-stock-status-in-stock";
                 }
 
@@ -208,7 +191,6 @@ namespace tp_c_equipo_3B
             gvProductos.DataSource = listaProcesada;
             gvProductos.DataBind();
 
-            // Actualizar etiquetas
             int totalItems = listaProcesada.Count;
             int totalPages = gvProductos.PageCount;
             if (totalPages == 0) totalPages = 1;
@@ -249,13 +231,13 @@ namespace tp_c_equipo_3B
 
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
-            gvProductos.PageIndex = 0; // Resetear a la página 1
+            gvProductos.PageIndex = 0;
             BindGrid();
         }
 
         protected void Filtro_SelectedIndexChanged(object sender, EventArgs e)
         {
-            gvProductos.PageIndex = 0; // Resetear a la página 1
+            gvProductos.PageIndex = 0;
             BindGrid();
         }
 
@@ -300,7 +282,7 @@ namespace tp_c_equipo_3B
 
                 lblMensaje.Text = "Producto agregado correctamente.";
                 pnlFormulario.Visible = false;
-                BindGrid(); // Recargar grilla
+                BindGrid();
 
                 btnGuardar.Visible = true;
                 btnModificar.Visible = true;
@@ -341,7 +323,7 @@ namespace tp_c_equipo_3B
 
                 lblMensaje.Text = "Producto modificado correctamente.";
                 pnlFormulario.Visible = false;
-                BindGrid(); // Recargar grilla
+                BindGrid();
 
                 btnGuardar.Visible = true;
                 btnModificar.Visible = true;
@@ -359,6 +341,8 @@ namespace tp_c_equipo_3B
 
             btnGuardar.Visible = true;
             btnModificar.Visible = true;
+            spanPrecioActual.Visible = false;
+            spanPorcentajeActual.Visible = false;
         }
 
         protected void rblImagenTipo_SelectedIndexChanged(object sender, EventArgs e)
@@ -393,7 +377,6 @@ namespace tp_c_equipo_3B
             }
             else if (idArticuloExistente.HasValue)
             {
-                // Cargar la lista fresca para buscar
                 Articulo artActual = articuloSQL.Listar().Find(x => x.Id == idArticuloExistente.Value);
                 if (artActual != null)
                 {
@@ -455,6 +438,10 @@ namespace tp_c_equipo_3B
             pnlUpload.Visible = true;
             pnlUrl.Visible = false;
             txtUrlImagen.Text = "";
+            spanPrecioActual.Visible = false;
+            spanPorcentajeActual.Visible = false;
+            litPrecioActual.Text = "";
+            litPorcentajeActual.Text = "";
         }
 
         #endregion
@@ -465,7 +452,6 @@ namespace tp_c_equipo_3B
         {
             int id = Convert.ToInt32(gvProductos.DataKeys[e.NewEditIndex].Value);
 
-            // Cargar la lista para buscar
             Articulo art = articuloSQL.Listar().Find(x => x.Id == id);
             if (art == null) return;
 
@@ -482,7 +468,7 @@ namespace tp_c_equipo_3B
             ddlMarcaForm_Form.SelectedValue = art.IdMarca.ToString();
             ddlCategoriaForm_Form.SelectedValue = art.IdCategoria.ToString();
 
-            if (!string.IsNullOrEmpty(art.UrlImagen) && (art.UrlImagen.StartsWith("http") || art.UrlImagen.StartsWith("httpsU")))
+            if (!string.IsNullOrEmpty(art.UrlImagen) && (art.UrlImagen.StartsWith("http") || art.UrlImagen.StartsWith("https")))
             {
                 rblImagenTipo.SelectedValue = "URL";
                 pnlUrl.Visible = true;
@@ -503,6 +489,12 @@ namespace tp_c_equipo_3B
             {
                 li.Selected = idsProveedores.Contains(int.Parse(li.Value));
             }
+
+            // Mostrar referencias
+            spanPrecioActual.Visible = true;
+            litPrecioActual.Text = art.UltimoPrecioCompra.ToString("C");
+            spanPorcentajeActual.Visible = true;
+            litPorcentajeActual.Text = art.PorcentajeGanancia.ToString("N2") + " %";
 
             ViewState["IdEditar"] = id;
             pnlFormulario.Visible = true;

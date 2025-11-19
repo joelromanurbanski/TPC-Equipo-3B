@@ -27,8 +27,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // Trae todos los IDs de artículos asociados a un proveedor
-        public List<int> ListarIdsArticuloPorProveedor(int idProveedor)
+         public List<int> ListarIdsArticuloPorProveedor(int idProveedor)
         {
             List<int> ids = new List<int>();
             AccesoDatos datos = new AccesoDatos();
@@ -48,21 +47,18 @@ namespace SQL
         }
 
 
-        // Borra y re-asigna los proveedores de un artículo (usa transacción)
-        public void ActualizarProveedores(int idArticulo, List<int> idsProveedores)
+         public void ActualizarProveedores(int idArticulo, List<int> idsProveedores)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
                 datos.iniciarTransaccion();
 
-                // 1. Borrar todas las asociaciones viejas
-                datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdArticulo = @IdArticulo");
+                 datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdArticulo = @IdArticulo");
                 datos.setearParametro("@IdArticulo", idArticulo);
                 datos.ejecutarAccion();
 
-                // 2. Insertar las nuevas asociaciones
-                if (idsProveedores != null && idsProveedores.Count > 0)
+                 if (idsProveedores != null && idsProveedores.Count > 0)
                 {
                     foreach (int idProveedor in idsProveedores)
                     {

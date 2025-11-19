@@ -27,6 +27,18 @@
                     <section class="card shadow-sm border-0 rounded-xl">
                         <div class="card-body p-4 p-md-5">
                             <h2 class="h4 fw-bold text-dark mb-4">Cliente</h2>
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-7">
+                                    <label class="form-label" for="<%= txtBuscarClienteDNI.ClientID %>">Buscar por Documento (DNI)</label>
+                                    <asp:TextBox ID="txtBuscarClienteDNI" runat="server" CssClass="form-control" />
+                                </div>
+                                <div class="col-md-5 d-flex align-items-end gap-2">
+                                    <asp:Button ID="btnBuscarCliente" runat="server" Text="Buscar" CssClass="btn btn-primary w-100" OnClick="btnBuscarCliente_Click" CausesValidation="false" />
+                                    <asp:Button ID="btnLimpiarBusquedaCliente" runat="server" Text="Limpiar" CssClass="btn btn-outline-secondary w-100" OnClick="btnLimpiarBusquedaCliente_Click" CausesValidation="false" />
+                                </div>
+                            </div>
+                            
                             <div class="d-flex align-items-start gap-3">
                                 <div class="flex-grow-1">
                                     <label class="form-label" for="<%= ddlCliente.ClientID %>">Seleccionar Cliente *</label>
@@ -34,7 +46,7 @@
                                     <asp:RequiredFieldValidator ErrorMessage="Debe seleccionar un cliente." ControlToValidate="ddlCliente" InitialValue="0" CssClass="text-danger" Display="Dynamic" runat="server" />
                                 </div>
                                 <a href="GestionClientes.aspx" class="flex-shrink-0 btn bg-primary-light hover-bg-primary-light text-primary d-flex align-items-center justify-content-center" 
-                                    style="width: 3.5rem; height: 3.5rem; margin-top: 2rem;">
+                                    style="width: 3.5rem; height: 3.5rem; margin-top: 2rem;" title="Agregar Nuevo Cliente">
                                     <span class="material-symbols-outlined fs-4">add</span>
                                 </a>
                             </div>

@@ -15,9 +15,9 @@ namespace tp_c_equipo_3B
         private ArticuloSQL articuloSQL = new ArticuloSQL();
         private CompraSQL compraSQL = new CompraSQL();
 
-        // ViewState
+        
         private const string ViewStateKey_Items = "Compra_Items";
-        // Impuesto
+        
         private const decimal ImpuestoPorcentaje = 0.21m;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -37,7 +37,7 @@ namespace tp_c_equipo_3B
             CargarProveedores();
             CargarArticulos();
 
-            // Fecha de hoy
+            
             txtFecha.Text = DateTime.Now.ToString("yyyy-MM-dd");
 
             
@@ -64,7 +64,7 @@ namespace tp_c_equipo_3B
 
         protected void btnAgregarProducto_Click(object sender, EventArgs e)
         {
-            // Validaciones
+            
             if (ddlArticulo.SelectedValue == "0")
             {
                 MostrarMensaje("Debe seleccionar un producto.");
@@ -81,22 +81,22 @@ namespace tp_c_equipo_3B
                 return;
             }
 
-            // Cargar lista ViewState
+            
             var items = (List<DetalleCompra>)ViewState[ViewStateKey_Items];
             int idArticulo = int.Parse(ddlArticulo.SelectedValue);
 
-            // Verificar si el producto ya está en la lista
+            
             var existente = items.FirstOrDefault(x => x.Articulo.Id == idArticulo);
 
             if (existente != null)
             {
-                // Si existe, actualizar cantidad y precio
+            
                 existente.Cantidad += cantidad;
                 existente.PrecioCompra = precio;
             }
             else
             {
-                // Si no existe, crear el nuevo DetalleCompra
+            
                 DetalleCompra nuevoItem = new DetalleCompra
                 {
                     Articulo = new Articulo
@@ -110,11 +110,11 @@ namespace tp_c_equipo_3B
                 items.Add(nuevoItem);
             }
 
-            // Guardar lista en ViewState y actualizar UI
+            
             ViewState[ViewStateKey_Items] = items;
             ActualizarGridYTotales();
 
-            // Limpiar campos de agregado
+            
             ddlArticulo.SelectedIndex = 0;
             txtCantidad.Text = "1";
             txtPrecioCompraUnitario.Text = "0";
@@ -152,7 +152,7 @@ namespace tp_c_equipo_3B
 
             try
             {
-                // Crear el objeto Compra 
+            
                 Compra nuevaCompra = new Compra
                 {
                     Proveedor = new Proveedor { Id = int.Parse(ddlProveedor.SelectedValue) },
@@ -161,10 +161,10 @@ namespace tp_c_equipo_3B
                     TotalCompra = decimal.Parse(lblTotal.Text, System.Globalization.NumberStyles.Currency)
                 };
 
-                // Llamar  SQL
+            
                 compraSQL.RegistrarCompra(nuevaCompra);
 
-                // Limpiar
+            
                 InicializarPagina();
                 MostrarMensaje("¡Compra registrada con éxito! El stock y los precios de costo han sido actualizados.", true);
             }
@@ -182,7 +182,7 @@ namespace tp_c_equipo_3B
 
         protected void txtOtrosCostos_TextChanged(object sender, EventArgs e)
         {
-            // Calcular totales si hay costos adicionales
+            
             ActualizarGridYTotales();
         }
 
@@ -194,7 +194,7 @@ namespace tp_c_equipo_3B
             gvProductos.DataSource = items;
             gvProductos.DataBind();
 
-            // Calcular totales
+            
             decimal subtotal = items.Sum(i => i.Subtotal);
             decimal impuestos = Math.Round(subtotal * ImpuestoPorcentaje, 2);
             decimal otrosCostos = 0;
@@ -202,8 +202,8 @@ namespace tp_c_equipo_3B
 
             decimal total = subtotal + impuestos + otrosCostos;
 
-            // Actualizar Labels del resumen
-            lblSubtotal.Text = subtotal.ToString("C"); // "C" = Formato Moneda
+            
+            lblSubtotal.Text = subtotal.ToString("C"); 
             lblImpuestos.Text = impuestos.ToString("C");
             lblTotal.Text = total.ToString("C");
         }

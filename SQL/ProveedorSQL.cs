@@ -79,13 +79,11 @@ namespace SQL
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                // borramos las relaciones
-                datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdProveedor = @Id");
+                 datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdProveedor = @Id");
                 datos.setearParametro("@Id", id);
                 datos.ejecutarAccion();
 
-                // borramos al proveedor
-                datos.setearConsulta("DELETE FROM Proveedor WHERE Id = @Id");
+                 datos.setearConsulta("DELETE FROM Proveedor WHERE Id = @Id");
                 datos.setearParametro("@Id", id);
                 datos.ejecutarAccion();
             }

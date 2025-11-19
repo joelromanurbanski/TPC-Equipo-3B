@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using Dominio;
 using SQL;
 
+
 namespace tp_c_equipo_3B
 {
     public partial class RegistroVenta : System.Web.UI.Page
@@ -30,24 +31,31 @@ namespace tp_c_equipo_3B
         {
             ViewState[ViewStateKey_Items] = new List<DetalleVenta>();
 
-            CargarClientes();
-            CargarArticulos(); // Cargar productos con stock
+            CargarClientes(null); 
+            CargarArticulos();
 
-            // Limpiar formulario
             ddlCliente.SelectedIndex = 0;
             ddlArticulo.SelectedIndex = 0;
             txtCantidad.Text = "1";
             txtDescuento.Text = "0";
             lblPrecioUnitario.Text = "$0.00";
             lblStockDisponible.Text = "";
+            txtBuscarClienteDNI.Text = "";
 
             ActualizarGridYTotales();
         }
 
-        private void CargarClientes()
+        private void CargarClientes(string filtroDNI)
         {
-            ddlCliente.DataSource = clienteSQL.Listar();
-            ddlCliente.DataTextField = "Nombre"; 
+            var listaClientes = clienteSQL.Listar();
+
+            if (!string.IsNullOrEmpty(filtroDNI))
+            {
+                listaClientes = listaClientes.Where(c => c.Documento.Contains(filtroDNI)).ToList();
+            }
+
+            ddlCliente.DataSource = listaClientes;
+            ddlCliente.DataTextField = "NombreCompleto";
             ddlCliente.DataValueField = "Id";
             ddlCliente.DataBind();
             ddlCliente.Items.Insert(0, new ListItem("Seleccionar cliente", "0"));
@@ -55,7 +63,6 @@ namespace tp_c_equipo_3B
 
         private void CargarArticulos()
         {
-            // Solo listar articulos con stock
             var articulosConStock = articuloSQL.Listar().Where(a => a.StockActual > 0).ToList();
             ddlArticulo.DataSource = articulosConStock;
             ddlArticulo.DataTextField = "Nombre";
@@ -64,7 +71,32 @@ namespace tp_c_equipo_3B
             ddlArticulo.Items.Insert(0, new ListItem("Seleccionar producto", "0"));
         }
 
-        // Seleccionar un producto
+        protected void btnBuscarCliente_Click(object sender, EventArgs e)
+        {
+            string dni = txtBuscarClienteDNI.Text.Trim();
+            if (string.IsNullOrEmpty(dni))
+            {
+                MostrarMensaje("Ingrese un DNI para buscar.");
+                return;
+            }
+
+            CargarClientes(dni); 
+            lblMensaje.Visible = false;
+
+            
+            if (ddlCliente.Items.Count == 2) 
+            {
+                ddlCliente.SelectedIndex = 1;
+            }
+        }
+        protected void btnLimpiarBusquedaCliente_Click(object sender, EventArgs e)
+        {
+            txtBuscarClienteDNI.Text = "";
+            CargarClientes(null);
+            lblMensaje.Visible = false;
+        }
+
+
         protected void ddlArticulo_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (ddlArticulo.SelectedValue == "0")
@@ -75,11 +107,10 @@ namespace tp_c_equipo_3B
             }
 
             int idArticulo = int.Parse(ddlArticulo.SelectedValue);
-            Articulo art = articuloSQL.GetById(idArticulo); 
+            Articulo art = articuloSQL.GetById(idArticulo);
 
             if (art != null)
             {
-                // Precio
                 decimal precioVenta = art.UltimoPrecioCompra * (1 + (art.PorcentajeGanancia / 100));
 
                 lblPrecioUnitario.Text = precioVenta.ToString("C");
@@ -103,7 +134,6 @@ namespace tp_c_equipo_3B
             int idArticulo = int.Parse(ddlArticulo.SelectedValue);
             Articulo art = articuloSQL.GetById(idArticulo);
 
-            // Validar stock
             if (cantidad > art.StockActual)
             {
                 MostrarMensaje($"Stock insuficiente. Solo quedan {art.StockActual} unidades de {art.Nombre}.");
@@ -115,24 +145,21 @@ namespace tp_c_equipo_3B
 
             if (existente != null)
             {
-                // Si ya está en el carrito, sumar cantidad
                 existente.Cantidad += cantidad;
-                // Validar stock total en carrito
                 if (existente.Cantidad > art.StockActual)
                 {
-                    existente.Cantidad = art.StockActual; // Limitar al stock
+                    existente.Cantidad = art.StockActual;
                     MostrarMensaje($"Stock máximo alcanzado para {art.Nombre}.");
                 }
                 existente.Subtotal = existente.Cantidad * existente.PrecioUnitario;
             }
             else
             {
-                // Si es nuevo, agregarlo
                 decimal precioVenta = art.UltimoPrecioCompra * (1 + (art.PorcentajeGanancia / 100));
 
                 DetalleVenta nuevoItem = new DetalleVenta
                 {
-                    Articulo = art, // Guardar el objeto completo
+                    Articulo = art,
                     Cantidad = cantidad,
                     PrecioUnitario = precioVenta,
                     Subtotal = cantidad * precioVenta
@@ -143,7 +170,6 @@ namespace tp_c_equipo_3B
             ViewState[ViewStateKey_Items] = items;
             ActualizarGridYTotales();
 
-            // Limpiar
             ddlArticulo.SelectedIndex = 0;
             txtCantidad.Text = "1";
             lblPrecioUnitario.Text = "$0.00";
@@ -191,15 +217,11 @@ namespace tp_c_equipo_3B
                     TotalVenta = decimal.Parse(lblTotal.Text, System.Globalization.NumberStyles.Currency)
                 };
 
-                // Registrar la venta y saca stock
                 int idVenta = ventaSQL.RegistrarVenta(nuevaVenta);
 
-                // Limpia
                 InicializarPagina();
 
-                // Mostrar exito y (opcional) redirigir a la factura
                 MostrarMensaje($"¡Venta registrada con éxito! Factura N°: {nuevaVenta.NumeroFactura}", true);
-                //Response.Redirect($"FacturaVenta.aspx?id={idVenta}");
             }
             catch (Exception ex)
             {
@@ -213,7 +235,6 @@ namespace tp_c_equipo_3B
             lblMensaje.Visible = false;
         }
 
-        // Se dispara si cambian el descuento
         protected void txtCalculo_TextChanged(object sender, EventArgs e)
         {
             ActualizarGridYTotales();

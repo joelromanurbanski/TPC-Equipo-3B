@@ -66,7 +66,7 @@
 
         <asp:Panel ID="pnlFormulario" runat="server" CssClass="card mb-4" Visible="false">
             <div class="card-body">
-                <div class="row g-3 p-3">
+                 <div class="row g-3 p-3">
                    
                     <div class="col-md-6">
                         <label class="form-label">Código/SKU</label>
@@ -83,13 +83,22 @@
      
                     <div class="col-md-6">
                         <label class="form-label">Precio de Costo (Última Compra)</label>
-                        <asp:TextBox ID="txtUltimoPrecioCompra" runat="server" CssClass="form-control" 
-                            Placeholder="Ej: 750000" TextMode="Number" step="0.01" />
+                        <div class="input-group">
+                            <asp:TextBox ID="txtUltimoPrecioCompra" runat="server" CssClass="form-control" TextMode="Number" step="0.01" />
+                            <span class="input-group-text bg-light" ID="spanPrecioActual" runat="server" Visible="false">
+                                Actual: <asp:Literal ID="litPrecioActual" runat="server"></asp:Literal>
+                            </span>
+                        </div>
                     </div>
+                    
                      <div class="col-md-6">
                         <label class="form-label">Porcentaje de Ganancia (%)</label>
-                        <asp:TextBox ID="txtPorcentajeGanancia" runat="server" CssClass="form-control" 
-                            Placeholder="Ej: 30.5" TextMode="Number" step="0.01" />
+                         <div class="input-group">
+                            <asp:TextBox ID="txtPorcentajeGanancia" runat="server" CssClass="form-control" TextMode="Number" step="0.01" />
+                             <span class="input-group-text bg-light" ID="spanPorcentajeActual" runat="server" Visible="false">
+                                Actual: <asp:Literal ID="litPorcentajeActual" runat="server"></asp:Literal>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="col-md-6">
@@ -144,7 +153,7 @@
                         <asp:Button ID="btnModificar" runat="server" Text="Modificar" OnClick="btnModificar_Click" CssClass="btn btn-warning" />
                         <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" OnClick="btnCancelar_Click" CssClass="btn btn-secondary" />
                     </div>
-                </div>
+                 </div>
             </div>
         </asp:Panel>
 
@@ -165,14 +174,15 @@
                             <ItemStyle Width="40px" />
                         </asp:TemplateField>
 
-                        <asp:BoundField DataField="Nombre" HeaderText="Nombre del Producto" />
+                        <asp:BoundField DataField="Nombre" HeaderText="Nombre del Producto" ItemStyle-Wrap="false" />
                         <asp:BoundField DataField="Codigo" HeaderText="Código/SKU" />
-                        <asp:BoundField DataField="Categoria.Descripcion" HeaderText="Categoría" />
+                        <asp:BoundField DataField="Categoria.Descripcion" HeaderText="Categoría" ItemStyle-Wrap="false" />
                         <asp:BoundField DataField="Marca.Descripcion" HeaderText="Marca" />
-                        <asp:BoundField DataField="ProveedoresString" HeaderText="Proveedores" />
-                        <asp:BoundField DataField="UltimoPrecioCompra" HeaderText="Precio Costo" DataFormatString="{0:C}" />
-                        <asp:BoundField DataField="PorcentajeGanancia" HeaderText="Ganancia (%)" DataFormatString="{0:N2} %" />
-                        <asp:BoundField DataField="PrecioVenta" HeaderText="Precio Venta" DataFormatString="{0:C}" />
+                        <asp:BoundField DataField="ProveedoresString" HeaderText="Proveedores" ItemStyle-Wrap="false" />
+                        
+                        <asp:BoundField DataField="UltimoPrecioCompra" HeaderText="Precio Costo" DataFormatString="{0:C}" ItemStyle-Wrap="false" />
+                        <asp:BoundField DataField="PorcentajeGanancia" HeaderText="Ganancia (%)" DataFormatString="{0:N2} %" ItemStyle-Wrap="false" />
+                        <asp:BoundField DataField="PrecioVenta" HeaderText="Precio Venta" DataFormatString="{0:C}" ItemStyle-Wrap="false" />
                 
                         <asp:TemplateField HeaderText="Stock">
                             <ItemTemplate>
@@ -180,6 +190,7 @@
                                     Text='<%# Eval("StockDisplay") %>' 
                                     CssClass='<%# Eval("StockClass") %>'></asp:Label>
                             </ItemTemplate>
+                            <ItemStyle Wrap="false" /> 
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Imagen">
@@ -195,9 +206,10 @@
                             <ItemStyle Width="80px" />
                         </asp:TemplateField>
                         
-                        <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" />
+                        <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" ItemStyle-Wrap="false" />
                     </Columns>
-                    <PagerStyle CssClass="d-none" /> </asp:GridView>
+                    <PagerStyle CssClass="d-none" /> 
+                </asp:GridView>
             </div>
         </div>
 

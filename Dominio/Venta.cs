@@ -24,7 +24,7 @@ namespace Dominio
         public Articulo Articulo { get; set; }
         public int Cantidad { get; set; }
         public decimal PrecioUnitario { get; set; }
-        public decimal Subtotal { get; set; } // Esta propiedad la calculamos y asignamos en el .cs
+        public decimal Subtotal { get; set; }  
         public int ArticuloId => Articulo.Id;
     }
 }
