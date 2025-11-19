@@ -229,5 +229,37 @@ namespace SQL
             catch (Exception ex) { throw ex; }
             finally { datos.cerrarConexion(); }
         }
+
+        public List<Articulo> ListarBajoStock(int top = 5)
+        {
+            List<Articulo> lista = new List<Articulo>();
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearConsulta(@"
+            SELECT TOP (@Top) Id, Codigo, Nombre, StockActual, StockMinimo
+            FROM Articulo
+            WHERE StockActual <= StockMinimo AND StockActual > 0
+            ORDER BY StockActual ASC");
+
+                datos.setearParametro("@Top", top);
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    lista.Add(new Articulo
+                    {
+                        Id = (int)datos.Lector["Id"],
+                        Codigo = datos.Lector["Codigo"].ToString(),
+                        Nombre = datos.Lector["Nombre"].ToString(),
+                        StockActual = (int)datos.Lector["StockActual"],
+                        StockMinimo = (int)datos.Lector["StockMinimo"]
+                    });
+                }
+                return lista;
+            }
+            catch (Exception ex) { throw ex; }
+            finally { datos.cerrarConexion(); }
+        }
     }
 }

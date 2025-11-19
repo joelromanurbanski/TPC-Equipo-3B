@@ -31,7 +31,7 @@ namespace tp_c_equipo_3B
         {
             ViewState[ViewStateKey_Items] = new List<DetalleVenta>();
 
-            CargarClientes(null); 
+            CargarClientes(null); // Cargar TODOS los clientes al inicio
             CargarArticulos();
 
             ddlCliente.SelectedIndex = 0;
@@ -80,10 +80,10 @@ namespace tp_c_equipo_3B
                 return;
             }
 
-            CargarClientes(dni); 
+            CargarClientes(dni); // Recargar el dropdown solo con los clientes filtrados
             lblMensaje.Visible = false;
 
-            
+            // Si solo se encuentra 1, seleccionarlo
             if (ddlCliente.Items.Count == 2) 
             {
                 ddlCliente.SelectedIndex = 1;
@@ -92,7 +92,7 @@ namespace tp_c_equipo_3B
         protected void btnLimpiarBusquedaCliente_Click(object sender, EventArgs e)
         {
             txtBuscarClienteDNI.Text = "";
-            CargarClientes(null);
+            CargarClientes(null); // Recargar todos los clientes
             lblMensaje.Visible = false;
         }
 

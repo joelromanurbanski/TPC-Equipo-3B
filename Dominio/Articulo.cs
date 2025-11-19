@@ -28,11 +28,9 @@ namespace Dominio
         public int IdCategoria { get; set; }
         public virtual Marca Marca { get; set; }
         public virtual Categoria Categoria { get; set; }
-        public string UrlImagen { get; set; }  
+        public string UrlImagen { get; set; }  // Imagen principal
         public virtual ICollection<Imagen> Imagenes { get; set; }
         public virtual ICollection<Proveedor> Proveedores { get; set; }
-
-        
         public string ProveedoresString { get; set; }
         public string FirstImage()
         {

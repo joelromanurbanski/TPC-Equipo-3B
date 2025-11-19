@@ -12,7 +12,8 @@ namespace tp_c_equipo_3B
 {
     public partial class GestionClientes : Page
     {
-         private ClienteSQL clienteSQL = new ClienteSQL();
+        // Instancia de la capa de datos
+        private ClienteSQL clienteSQL = new ClienteSQL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -26,7 +27,8 @@ namespace tp_c_equipo_3B
         {
             var lista = clienteSQL.Listar();
 
-             var data = lista.Select(c => new
+            // Proyección para la grilla
+            var data = lista.Select(c => new
             {
                 c.Id,
                 NombreCompleto = $"{c.Nombre} {c.Apellido}".Trim(),
@@ -152,7 +154,7 @@ namespace tp_c_equipo_3B
             try
             {
                 int id = int.Parse(e.CommandArgument.ToString());
-                var lista = clienteSQL.Listar();  
+                var lista = clienteSQL.Listar(); // Volver a cargar la lista
 
                 if (e.CommandName == "Editar")
                 {
@@ -190,7 +192,7 @@ namespace tp_c_equipo_3B
         protected void gvClientes_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             gvClientes.PageIndex = e.NewPageIndex;
-            BindGrid(txtBuscarClientes.Text.Trim());  
+            BindGrid(txtBuscarClientes.Text.Trim()); // Mantener el filtro al paginar
         }
 
         protected void btnRefrescar_Click(object sender, EventArgs e)

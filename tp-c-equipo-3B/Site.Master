@@ -30,12 +30,14 @@
             .step-right { justify-content:flex-end; }
         }
     </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server" />
 
-        <!-- NAVBAR -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand nav-brand" runat="server" href="~/PaneldeControl.aspx">Panel de Control</a>
@@ -62,7 +64,6 @@
             </div>
         </nav>
 
-        <!-- ENCABEZADO GLOBAL -->
         <div class="bg-white border-bottom py-3">
             <div class="container d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-3">
@@ -90,7 +91,6 @@
             </div>
         </div>
 
-        <!-- BARRA "Part A: Context" VISIBLE EN TODAS LAS PESTAÑAS -->
         <div class="step-bar" id="stepBarContainer" runat="server">
             <div class="inner">
                 <div class="step-left">
@@ -106,12 +106,10 @@
             </div>
         </div>
 
-        <!-- CONTENIDO -->
         <div class="container my-4">
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
         </div>
 
-        <!-- FOOTER -->
         <footer class="py-3 bg-light mt-auto">
             <div class="container text-muted small">&copy; <%: DateTime.Now.Year %> - Gestión de Negocios</div>
         </footer>

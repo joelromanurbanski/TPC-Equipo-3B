@@ -47,6 +47,7 @@
     <Compile Include="CategoriaSQL.cs" />
     <Compile Include="ClienteSQL.cs" />
     <Compile Include="CompraSQL.cs" />
+    <Compile Include="DashboardSQL.cs" />
     <Compile Include="ImagenSQL.cs" />
     <Compile Include="MarcaSQL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

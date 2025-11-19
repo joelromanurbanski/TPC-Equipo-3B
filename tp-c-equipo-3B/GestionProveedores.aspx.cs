@@ -100,7 +100,8 @@ namespace tp_c_equipo_3B
             }
         }
 
- 
+        // Botones
+
         protected void btnBuscarProveedorSidebar_Click(object sender, EventArgs e)
         {
             string q = txtBuscarProveedorSidebar.Text.Trim();
@@ -152,10 +153,12 @@ namespace tp_c_equipo_3B
 
         protected void btnNuevoProveedor_Click(object sender, EventArgs e)
         {
-             pnlVacio.Visible = false;
+            // Ocultar paneles
+            pnlVacio.Visible = false;
             pnlDetalle.Visible = false;
 
-             pnlFormulario.Visible = true;
+            // Mostrar el formulario en modo "Nuevo"
+            pnlFormulario.Visible = true;
             litTitulo.Text = "Nuevo Proveedor";
             LimpiarFormulario();
             btnGuardar.Visible = true;
