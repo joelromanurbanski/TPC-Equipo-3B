@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+
 namespace tp_c_equipo_3B
 {
     public partial class SiteMaster : MasterPage
@@ -27,14 +28,5 @@ namespace tp_c_equipo_3B
             Response.Redirect("~/InicioSesion.aspx");
         }
 
-        protected void btnGenerar_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("~/Generador.aspx");
-        }
-
-        protected void btnContinue_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("~/SiguientePaso.aspx");
-        }
     }
 }

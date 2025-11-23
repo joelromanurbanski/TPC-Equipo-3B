@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Dominio;
 
+
 namespace SQL
 {
     public class AccesoDatos
@@ -14,7 +15,7 @@ namespace SQL
         private SqlConnection conexion;
         private SqlCommand comando;
         private SqlDataReader lector;
-        private SqlTransaction transaccion;
+        private SqlTransaction transaccion; // Variable para la transacción
 
         public SqlDataReader Lector => lector;
 
@@ -23,6 +24,8 @@ namespace SQL
             conexion = new SqlConnection("server=.\\SQLEXPRESS; database=GestionNegocio; integrated security=true");
             comando = new SqlCommand();
         }
+
+        // Métodos de Transacción
         public void iniciarTransaccion()
         {
             try
@@ -47,6 +50,8 @@ namespace SQL
         {
             transaccion?.Rollback();
         }
+
+        // Cierre especial para transacciones
         public void cerrarConexionTransaccional()
         {
             lector?.Close();
@@ -54,6 +59,8 @@ namespace SQL
             if (conexion.State != System.Data.ConnectionState.Closed)
                 conexion.Close();
         }
+
+        // Métodos de Acceso a Datos
 
         public void setearConsulta(string consulta)
         {
@@ -75,6 +82,7 @@ namespace SQL
             comando.Connection = conexion;
             try
             {
+                // No abrir la conexión si ya está abierta por una transacción
                 if (transaccion == null && conexion.State != ConnectionState.Open)
                     conexion.Open();
                 lector = comando.ExecuteReader();
@@ -90,6 +98,7 @@ namespace SQL
             comando.Connection = conexion;
             try
             {
+                // No abrir la conexión si ya está abierta por una transacción
                 if (transaccion == null && conexion.State != ConnectionState.Open)
                     conexion.Open();
                 comando.ExecuteNonQuery();
@@ -105,6 +114,7 @@ namespace SQL
             comando.Connection = conexion;
             try
             {
+                // No abrir la conexión si ya está abierta por una transacción
                 if (transaccion == null && conexion.State != ConnectionState.Open)
                     conexion.Open();
                 return comando.ExecuteScalar();

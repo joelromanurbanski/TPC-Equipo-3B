@@ -6,25 +6,23 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Dominio;
 using SQL;
-using System.Web.Script.Serialization; 
+using System.Web.Script.Serialization;
+
 
 namespace tp_c_equipo_3B
 {
     public partial class PaneldeControl : System.Web.UI.Page
     {
-        // Instancias de las clases SQL
         private DashboardSQL dashboardSQL = new DashboardSQL();
         private ArticuloSQL articuloSQL = new ArticuloSQL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-            {
-                CargarStatsCards();
-                CargarBajoStock();
-                CargarActividadReciente();
-                CargarGrafico();
-            }
+
+            CargarStatsCards();
+            CargarBajoStock();
+            CargarActividadReciente();
+            CargarGrafico();
         }
 
         private void CargarStatsCards()
@@ -32,22 +30,19 @@ namespace tp_c_equipo_3B
             try
             {
                 DashboardStats stats = dashboardSQL.GetDashboardStats();
-
                 decimal gananciaNeta = stats.IngresosTotales - stats.CostosTotales;
 
-                // Formatear los números como moneda (ej: $15.230,50)
                 litIngresosTotales.Text = stats.IngresosTotales.ToString("C");
                 litCostosTotales.Text = stats.CostosTotales.ToString("C");
                 litGananciaNeta.Text = gananciaNeta.ToString("C");
                 litTransacciones.Text = stats.TotalTransacciones.ToString();
 
-                // Los % 
+                // (Stats % estáticos)
                 litIngresosStats.Text = "+5.2%";
                 litCostosStats.Text = "+3.1%";
                 litGananciaStats.Text = "+8.7%";
                 litTransaccionesStats.Text = "-1.2%";
 
-    
                 if (gananciaNeta < 0)
                 {
                     litGananciaNeta.CssClass = "text-danger fw-bolder mb-0";
@@ -56,7 +51,6 @@ namespace tp_c_equipo_3B
             }
             catch (Exception ex)
             {
-
                 litIngresosTotales.Text = "Error";
                 litCostosTotales.Text = "Error";
                 litGananciaNeta.Text = "Error";
@@ -66,7 +60,7 @@ namespace tp_c_equipo_3B
 
         private void CargarBajoStock()
         {
-            var lista = articuloSQL.ListarBajoStock(5); 
+            var lista = articuloSQL.ListarBajoStock(5);
             if (lista != null && lista.Count > 0)
             {
                 rptBajoStock.DataSource = lista;
@@ -81,7 +75,7 @@ namespace tp_c_equipo_3B
 
         private void CargarActividadReciente()
         {
-            var lista = dashboardSQL.ListarActividadReciente(5); 
+            var lista = dashboardSQL.ListarActividadReciente(15); // Traer el TOP 15
             if (lista != null && lista.Count > 0)
             {
                 rptActividadReciente.DataSource = lista;
@@ -93,7 +87,6 @@ namespace tp_c_equipo_3B
                 pnlNoActividad.Visible = true;
             }
         }
-
 
         private void CargarGrafico()
         {
@@ -111,22 +104,20 @@ namespace tp_c_equipo_3B
                 string jsonCompras = serializer.Serialize(comprasData);
 
                 string script = $@"
-                    var chartLabels = {jsonLabels};
-                    var chartVentasData = {jsonVentas};
-                    var chartComprasData = {jsonCompras};
+                    initializeSalesChart({jsonLabels}, {jsonVentas}, {jsonCompras});
                 ";
 
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ChartDataScript", script, true);
             }
             catch (Exception ex)
             {
-                string script = "var chartLabels = []; var chartVentasData = []; var chartComprasData = [];";
+                string script = "initializeSalesChart([], [], []);";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ChartDataScript", script, true);
             }
         }
 
 
-
+        // Helpers para la UI de Actividad Reciente
         protected string GetIconBgClass(string tipo)
         {
             return tipo == "Venta" ? "bg-success-20" : "bg-info-20";

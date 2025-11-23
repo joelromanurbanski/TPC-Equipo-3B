@@ -155,7 +155,7 @@
                                                 <p class="fw-semibold text-dark mb-0">
                                                     <%# GetActivityText(Eval("Tipo").ToString(), Eval("Id"), Eval("Monto"), Eval("NombreClienteOProveedor")) %>
                                                 </p>
-                                                <p class="small text-muted mb-0"><%# Eval("Fecha") %></p>
+                                                <p class="small text-muted mb-0"><%# Eval("Fecha", "{0:g}") %></p>
                                             </div>
                                         </li>
                                     </ItemTemplate>
@@ -172,8 +172,7 @@
     </div>
     
     <script type="text/javascript">
-
-        document.addEventListener("DOMContentLoaded", function () {
+        function initializeSalesChart(chartLabels, chartVentasData, chartComprasData) {
             if (typeof Chart === 'undefined') {
                 console.error('Chart.js no está cargado. Asegúrate de incluirlo en tu Site.master.');
                 return;
@@ -183,17 +182,17 @@
                 var myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: chartLabels, // Datos 
+                        labels: chartLabels,
                         datasets: [
                             {
                                 label: 'Ventas',
-                                data: chartVentasData, // Datos 
+                                data: chartVentasData,
                                 backgroundColor: '#28a745',
                                 borderRadius: 4
                             },
                             {
                                 label: 'Compras',
-                                data: chartComprasData, // Datos 
+                                data: chartComprasData,
                                 backgroundColor: '#007bff',
                                 borderRadius: 4
                             }
@@ -217,9 +216,7 @@
                                 callbacks: {
                                     label: function(context) {
                                         let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
+                                        if (label) { label += ': '; }
                                         if (context.parsed.y !== null) {
                                             label += '$' + context.parsed.y.toLocaleString('es-AR');
                                         }
@@ -234,6 +231,6 @@
                 console.error("Error al cargar el gráfico:", e);
                 document.getElementById('salesChart').parentElement.innerHTML = '<div class="text-center text-muted">Error al cargar el gráfico.</div>';
             }
-        });
+        }
     </script>
 </asp:Content>

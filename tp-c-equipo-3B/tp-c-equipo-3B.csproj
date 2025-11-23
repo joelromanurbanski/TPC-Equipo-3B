@@ -121,6 +121,7 @@
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="GestionClientes.aspx" />
+    <Content Include="GestionPedidos.aspx" />
     <Content Include="GestionProducto.aspx" />
     <Content Include="GestionProveedores.aspx" />
     <Content Include="GestionUsuarios.aspx" />
@@ -220,6 +221,13 @@
     </Compile>
     <Compile Include="GestionClientes.aspx.designer.cs">
       <DependentUpon>GestionClientes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GestionPedidos.aspx.cs">
+      <DependentUpon>GestionPedidos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GestionPedidos.aspx.designer.cs">
+      <DependentUpon>GestionPedidos.aspx</DependentUpon>
     </Compile>
     <Compile Include="GestionProducto.aspx.cs">
       <DependentUpon>GestionProducto.aspx</DependentUpon>

@@ -31,6 +31,9 @@ namespace Dominio
         public string UrlImagen { get; set; }  // Imagen principal
         public virtual ICollection<Imagen> Imagenes { get; set; }
         public virtual ICollection<Proveedor> Proveedores { get; set; }
+
+        // Propiedad ViewModel para la grilla
+        // (Transporta el string de proveedores desde SQL)
         public string ProveedoresString { get; set; }
         public string FirstImage()
         {

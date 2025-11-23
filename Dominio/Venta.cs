@@ -15,6 +15,7 @@ namespace Dominio
         public string NumeroFactura { get; set; }
         public List<DetalleVenta> Detalles { get; set; }
         public decimal TotalVenta { get; set; }
+        public string Estado { get; set; }
     }
 
     [Serializable]

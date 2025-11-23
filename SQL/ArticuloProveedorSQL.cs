@@ -48,7 +48,7 @@ namespace SQL
         }
 
 
-        // Borra y re-asigna los proveedores de un artículo (usa transacción)
+        // Borra y reasigna los proveedores de un artículo (usa transacción)
         public void ActualizarProveedores(int idArticulo, List<int> idsProveedores)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -56,12 +56,12 @@ namespace SQL
             {
                 datos.iniciarTransaccion();
 
-                // Borrar todas las asociaciones viejas
+                // 1. Borrar todas las asociaciones viejas
                 datos.setearConsulta("DELETE FROM ArticuloProveedor WHERE IdArticulo = @IdArticulo");
                 datos.setearParametro("@IdArticulo", idArticulo);
                 datos.ejecutarAccion();
 
-                // Insertar las nuevas asociaciones
+                // 2. Insertar las nuevas asociaciones
                 if (idsProveedores != null && idsProveedores.Count > 0)
                 {
                     foreach (int idProveedor in idsProveedores)

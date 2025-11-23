@@ -14,6 +14,7 @@ namespace Dominio
         public Proveedor Proveedor { get; set; }
         public List<DetalleCompra> Detalles { get; set; }
         public decimal TotalCompra { get; set; }
+        public string Estado { get; set; }
     }
 
     [Serializable]

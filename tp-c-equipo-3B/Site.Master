@@ -13,22 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .badge-tag { background:#f1f3f5; color:#111; border-radius:999px; padding:.35rem .6rem; font-size:.85rem; }
         .nav-brand { font-weight:700; }
-
-        /* Step bar styles */
-        .step-bar { background:#0f1724; color:#e6eef8; padding:10px 0; }
-        .step-bar .inner { display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:1200px; margin:0 auto; padding:0 16px; }
-        .step-left { display:flex; flex-direction:column; gap:4px; }
-        .step-title { font-weight:700; font-size:1.05rem; color:#ffffff; }
-        .step-sub { font-size:0.88rem; color:#9fb0c8; }
-        .step-sub .dot { margin:0 6px; color:#5b7088; }
-        .step-right { display:flex; align-items:center; gap:8px; }
-        .btn-continue { background:#0ea5e9; color:#07203a; border:none; padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer; }
-        @media (max-width:768px) {
-            .step-bar .inner { flex-direction:column; align-items:stretch; gap:8px; }
-            .step-right { justify-content:flex-end; }
-        }
     </style>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -53,6 +38,7 @@
                         <li class="nav-item"><a class="nav-link" runat="server" id="linkUsuarios" href="~/GestionUsuarios.aspx">Usuarios</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/RegistroCompra.aspx">Compras</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/RegistroVenta.aspx">Ventas</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/GestionPedidos.aspx">Pedidos</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/GestionProducto.aspx">Productos</a></li>
                     </ul>
 
@@ -72,36 +58,6 @@
                         <h1 class="h5 mb-0">Gestión de Negocios</h1>
                         <small class="text-muted">Panel administrativo</small>
                     </div>
-                </div>
-
-                <div class="text-end">
-                    <asp:Button ID="btnGenerar" runat="server" Text="Generar" CssClass="btn btn-primary btn-sm" OnClick="btnGenerar_Click" />
-                </div>
-            </div>
-
-            <div class="container mt-2">
-                <div class="d-flex gap-2 flex-wrap">
-                    <span class="badge-tag">MathWorld</span>
-                    <span class="badge-tag">Gatin</span>
-                    <span class="badge-tag">Homework</span>
-                    <span class="badge-tag">Courses</span>
-                    <span class="badge-tag">Math</span>
-                    <span class="badge-tag">MathFacts</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="step-bar" id="stepBarContainer" runat="server">
-            <div class="inner">
-                <div class="step-left">
-                    <div class="step-title">Part A: Context</div>
-                    <div class="step-sub">
-                        Main Idea <span class="dot">•</span> Anecdotes <span class="dot">•</span> Compare <span class="dot">•</span> Vivid <span class="dot">•</span> Reactions
-                    </div>
-                </div>
-
-                <div class="step-right">
-                    <asp:Button ID="btnContinue" runat="server" Text="CONTINUE" CssClass="btn-continue" OnClick="btnContinue_Click" />
                 </div>
             </div>
         </div>
