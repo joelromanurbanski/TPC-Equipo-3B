@@ -51,7 +51,6 @@ namespace SQL
             transaccion?.Rollback();
         }
 
-        // Cierre especial para transacciones
         public void cerrarConexionTransaccional()
         {
             lector?.Close();
@@ -59,8 +58,6 @@ namespace SQL
             if (conexion.State != System.Data.ConnectionState.Closed)
                 conexion.Close();
         }
-
-        // Métodos de Acceso a Datos
 
         public void setearConsulta(string consulta)
         {

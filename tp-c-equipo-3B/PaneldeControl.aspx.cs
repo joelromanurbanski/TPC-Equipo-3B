@@ -18,7 +18,6 @@ namespace tp_c_equipo_3B
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
             CargarStatsCards();
             CargarBajoStock();
             CargarActividadReciente();

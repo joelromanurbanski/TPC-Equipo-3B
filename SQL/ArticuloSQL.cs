@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Dominio;
 
+
 namespace SQL
 {
     public class ArticuloSQL
     {
+        // LISTAR
         public List<Articulo> Listar()
         {
             List<Articulo> lista = new List<Articulo>();
@@ -41,21 +43,17 @@ namespace SQL
                         Codigo = datos.Lector["Codigo"].ToString(),
                         Nombre = datos.Lector["Nombre"].ToString(),
                         Descripcion = datos.Lector["Descripcion"].ToString(),
-
                         UltimoPrecioCompra = datos.Lector["UltimoPrecioCompra"] != DBNull.Value ? (decimal)datos.Lector["UltimoPrecioCompra"] : 0,
                         PorcentajeGanancia = datos.Lector["PorcentajeGanancia"] != DBNull.Value ? (decimal)datos.Lector["PorcentajeGanancia"] : 0,
                         StockActual = datos.Lector["StockActual"] != DBNull.Value ? (int)datos.Lector["StockActual"] : 0,
                         StockMinimo = datos.Lector["StockMinimo"] != DBNull.Value ? (int)datos.Lector["StockMinimo"] : 0,
-
                         IdMarca = datos.Lector["IdMarca"] != DBNull.Value ? (int)datos.Lector["IdMarca"] : 0,
                         IdCategoria = datos.Lector["IdCategoria"] != DBNull.Value ? (int)datos.Lector["IdCategoria"] : 0,
                         Marca = new Marca { Descripcion = datos.Lector["Marca"].ToString() },
                         Categoria = new Categoria { Descripcion = datos.Lector["Categoria"].ToString() },
                         UrlImagen = datos.Lector["UrlImagen"] != DBNull.Value ? datos.Lector["UrlImagen"].ToString() : "",
-
                         ProveedoresString = datos.Lector["ProveedoresString"] != DBNull.Value ? datos.Lector["ProveedoresString"].ToString() : "Sin asignar"
                     };
-
                     lista.Add(art);
                 }
                 return lista;
@@ -64,6 +62,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
+        // AGREGAR
         public int AgregarYDevolverId(Articulo nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -93,6 +92,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
+        // MODIFICAR
         public void Modificar(Articulo art)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -125,6 +125,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
+        // ELIMINAR
         public void Eliminar(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -138,6 +139,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
+        // GETBYID
         public Articulo GetById(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -156,7 +158,7 @@ namespace SQL
 
                 if (datos.Lector.Read())
                 {
-                    Articulo art = new Articulo
+                    return new Articulo
                     {
                         Id = (int)datos.Lector["Id"],
                         Codigo = datos.Lector["Codigo"].ToString(),
@@ -164,13 +166,12 @@ namespace SQL
                         Descripcion = datos.Lector["Descripcion"].ToString(),
                         UltimoPrecioCompra = datos.Lector["UltimoPrecioCompra"] != DBNull.Value ? (decimal)datos.Lector["UltimoPrecioCompra"] : 0,
                         PorcentajeGanancia = datos.Lector["PorcentajeGanancia"] != DBNull.Value ? (decimal)datos.Lector["PorcentajeGanancia"] : 0,
-                        StockActual = (int)datos.Lector["StockActual"],
-                        StockMinimo = (int)datos.Lector["StockMinimo"],
-                        IdMarca = (int)datos.Lector["IdMarca"],
-                        IdCategoria = (int)datos.Lector["IdCategoria"],
+                        StockActual = datos.Lector["StockActual"] != DBNull.Value ? (int)datos.Lector["StockActual"] : 0,
+                        StockMinimo = datos.Lector["StockMinimo"] != DBNull.Value ? (int)datos.Lector["StockMinimo"] : 0,
+                        IdMarca = datos.Lector["IdMarca"] != DBNull.Value ? (int)datos.Lector["IdMarca"] : 0,
+                        IdCategoria = datos.Lector["IdCategoria"] != DBNull.Value ? (int)datos.Lector["IdCategoria"] : 0,
                         UrlImagen = datos.Lector["UrlImagen"] != DBNull.Value ? datos.Lector["UrlImagen"].ToString() : ""
                     };
-                    return art;
                 }
                 return null;
             }
@@ -178,6 +179,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
+        // LISTAR POR PROVEEDOR
         public List<Articulo> ListarPorProveedor(int idProveedor)
         {
             List<Articulo> lista = new List<Articulo>();
@@ -201,23 +203,13 @@ namespace SQL
 
                 while (datos.Lector.Read())
                 {
-                    Articulo art = new Articulo
+                    lista.Add(new Articulo
                     {
                         Id = (int)datos.Lector["Id"],
                         Codigo = datos.Lector["Codigo"].ToString(),
                         Nombre = datos.Lector["Nombre"].ToString(),
-                        Descripcion = datos.Lector["Descripcion"].ToString(),
-                        UltimoPrecioCompra = datos.Lector["UltimoPrecioCompra"] != DBNull.Value ? (decimal)datos.Lector["UltimoPrecioCompra"] : 0,
-                        PorcentajeGanancia = datos.Lector["PorcentajeGanancia"] != DBNull.Value ? (decimal)datos.Lector["PorcentajeGanancia"] : 0,
-                        StockActual = (int)datos.Lector["StockActual"],
-                        StockMinimo = (int)datos.Lector["StockMinimo"],
-                        IdMarca = (int)datos.Lector["IdMarca"],
-                        IdCategoria = (int)datos.Lector["IdCategoria"],
-                        Marca = new Marca { Descripcion = datos.Lector["Marca"].ToString() },
-                        Categoria = new Categoria { Descripcion = datos.Lector["Categoria"].ToString() },
-                        UrlImagen = datos.Lector["UrlImagen"] != DBNull.Value ? datos.Lector["UrlImagen"].ToString() : ""
-                    };
-                    lista.Add(art);
+                        StockActual = datos.Lector["StockActual"] != DBNull.Value ? (int)datos.Lector["StockActual"] : 0
+                    });
                 }
                 return lista;
             }
@@ -225,6 +217,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
+        // BAJO STOCK
         public List<Articulo> ListarBajoStock(int top = 5)
         {
             List<Articulo> lista = new List<Articulo>();
@@ -256,6 +249,8 @@ namespace SQL
             catch (Exception ex) { throw ex; }
             finally { datos.cerrarConexion(); }
         }
+
+        // REPONER STOCK
         public void ReponerStock(List<DetalleVenta> detalles)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -281,6 +276,5 @@ namespace SQL
                 datos.cerrarConexionTransaccional();
             }
         }
-
     }
 }

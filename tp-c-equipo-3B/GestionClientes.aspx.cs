@@ -8,11 +8,11 @@ using System.Web.UI.HtmlControls;
 using Dominio;
 using SQL;
 
+
 namespace tp_c_equipo_3B
 {
     public partial class GestionClientes : Page
     {
-        // Instancia de la capa de datos
         private ClienteSQL clienteSQL = new ClienteSQL();
 
         protected void Page_Load(object sender, EventArgs e)
@@ -20,6 +20,7 @@ namespace tp_c_equipo_3B
             if (!IsPostBack)
             {
                 BindGrid();
+                FillEstadisticas(); // Llenar stats al cargar
             }
         }
 
@@ -27,180 +28,165 @@ namespace tp_c_equipo_3B
         {
             var lista = clienteSQL.Listar();
 
-            // Proyección para la grilla
-            var data = lista.Select(c => new
-            {
-                c.Id,
-                NombreCompleto = $"{c.Nombre} {c.Apellido}".Trim(),
-                c.Documento,
-                c.Telefono,
-                c.Email
-            }).ToList();
-
             if (!string.IsNullOrEmpty(filtro))
             {
                 filtro = filtro.ToLowerInvariant();
-                data = data.Where(d => d.NombreCompleto.ToLowerInvariant().Contains(filtro)
-                    || (d.Documento != null && d.Documento.ToLowerInvariant().Contains(filtro))
-                    || (d.Email != null && d.Email.ToLowerInvariant().Contains(filtro))).ToList();
+                lista = lista.Where(c => c.NombreCompleto.ToLowerInvariant().Contains(filtro)
+                                      || c.Documento.Contains(filtro)).ToList();
             }
 
-            gvClientes.DataSource = data;
+            gvClientes.DataSource = lista;
             gvClientes.DataBind();
-        }
-
-        private void ClearForm()
-        {
-            txtNombre.Text = "";
-            txtApellido.Text = "";
-            txtDocumento.Text = "";
-            txtTelefono.Text = "";
-            txtEmail.Text = "";
-            txtDireccion.Text = "";
-            txtCiudad.Text = "";
-            txtCP.Text = "";
-            hfEditingId.Value = "";
         }
 
         protected void btnNuevoCliente_Click(object sender, EventArgs e)
         {
-            ClearForm();
+            LimpiarFormulario();
             pnlClienteForm.Visible = true;
-            hfEditingId.Value = string.Empty;
-            lblMensaje.Text = string.Empty;
-
-            litTitulo.Text = "Nuevo Cliente";
-            btnGuardar.Visible = true;
-            btnModificar.Visible = false;
+            lblMensaje.Visible = false;
         }
 
         protected void btnCancelarCliente_Click(object sender, EventArgs e)
         {
             pnlClienteForm.Visible = false;
-            lblMensaje.Text = string.Empty;
-            ClearForm();
+            lblMensaje.Visible = false;
         }
 
-        protected void btnGuardar_Click(object sender, EventArgs e)
+        protected void btnGuardarCliente_Click(object sender, EventArgs e)
         {
-            if (Page.IsValid)
+            if (!Page.IsValid) return;
+
+            try
             {
-                try
+                Cliente cliente = new Cliente
                 {
-                    var cliente = new Cliente
-                    {
-                        Nombre = txtNombre.Text.Trim(),
-                        Apellido = txtApellido.Text.Trim(),
-                        Documento = txtDocumento.Text.Trim(),
-                        Telefono = txtTelefono.Text.Trim(),
-                        Email = txtEmail.Text.Trim(),
-                        Direccion = txtDireccion.Text.Trim(),
-                        Ciudad = txtCiudad.Text.Trim(),
-                        CP = string.IsNullOrEmpty(txtCP.Text) ? 0 : int.Parse(txtCP.Text)
-                    };
+                    Nombre = txtNombre.Text.Trim(),
+                    Apellido = txtApellido.Text.Trim(),
+                    Documento = txtCedula.Text.Trim(),
+                    Email = txtEmail.Text.Trim(),
+                    Telefono = txtTelefono.Text.Trim(),
+                    Direccion = txtDireccion.Text.Trim()
+                };
 
+                if (string.IsNullOrEmpty(hfEditingId.Value))
+                {
+                    // Nuevo
                     clienteSQL.Agregar(cliente);
-
-                    BindGrid();
-                    pnlClienteForm.Visible = false;
-                    ClearForm();
+                    lblMensaje.Text = "Cliente agregado exitosamente.";
+                    lblMensaje.CssClass = "alert alert-success d-block mb-3";
                 }
-                catch (Exception ex)
+                else
                 {
-                    lblMensaje.Text = "Error al guardar: " + ex.Message;
+                    // Modificar
+                    cliente.Id = int.Parse(hfEditingId.Value);
+                    clienteSQL.Modificar(cliente);
+                    lblMensaje.Text = "Cliente modificado exitosamente.";
+                    lblMensaje.CssClass = "alert alert-success d-block mb-3";
                 }
+
+                lblMensaje.Visible = true;
+                pnlClienteForm.Visible = false;
+                BindGrid();
+                FillEstadisticas();
+            }
+            catch (Exception ex)
+            {
+                lblMensaje.Text = "Error: " + ex.Message;
+                lblMensaje.CssClass = "alert alert-danger d-block mb-3";
+                lblMensaje.Visible = true;
             }
         }
 
-        protected void btnModificar_Click(object sender, EventArgs e)
+        protected void gvClientes_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            if (Page.IsValid && !string.IsNullOrEmpty(hfEditingId.Value))
+            if (e.CommandName == "Editar")
+            {
+                int id = int.Parse(e.CommandArgument.ToString());
+                var cliente = clienteSQL.Listar().FirstOrDefault(c => c.Id == id);
+
+                if (cliente != null)
+                {
+                    hfEditingId.Value = cliente.Id.ToString();
+                    txtNombre.Text = cliente.Nombre;
+                    txtApellido.Text = cliente.Apellido;
+                    txtCedula.Text = cliente.Documento;
+                    txtEmail.Text = cliente.Email;
+                    txtTelefono.Text = cliente.Telefono;
+                    txtDireccion.Text = cliente.Direccion;
+
+                    pnlClienteForm.Visible = true;
+                }
+            }
+            else if (e.CommandName == "Eliminar")
             {
                 try
                 {
-                    var cliente = new Cliente
-                    {
-                        Id = int.Parse(hfEditingId.Value),
-                        Nombre = txtNombre.Text.Trim(),
-                        Apellido = txtApellido.Text.Trim(),
-                        Documento = txtDocumento.Text.Trim(),
-                        Telefono = txtTelefono.Text.Trim(),
-                        Email = txtEmail.Text.Trim(),
-                        Direccion = txtDireccion.Text.Trim(),
-                        Ciudad = txtCiudad.Text.Trim(),
-                        CP = string.IsNullOrEmpty(txtCP.Text) ? 0 : int.Parse(txtCP.Text)
-                    };
-
-                    clienteSQL.Modificar(cliente);
-
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    clienteSQL.Eliminar(id);
                     BindGrid();
-                    pnlClienteForm.Visible = false;
-                    ClearForm();
+                    FillEstadisticas();
+                    lblMensaje.Text = "Cliente eliminado.";
+                    lblMensaje.CssClass = "alert alert-warning d-block mb-3";
+                    lblMensaje.Visible = true;
                 }
                 catch (Exception ex)
                 {
-                    lblMensaje.Text = "Error al modificar: " + ex.Message;
+                    lblMensaje.Text = "Error al eliminar: " + ex.Message;
+                    lblMensaje.CssClass = "alert alert-danger d-block mb-3";
+                    lblMensaje.Visible = true;
                 }
             }
         }
 
         protected void btnBuscarClientes_Click(object sender, EventArgs e)
         {
+            gvClientes.PageIndex = 0;
             BindGrid(txtBuscarClientes.Text.Trim());
-        }
-
-        protected void gvClientes_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            try
-            {
-                int id = int.Parse(e.CommandArgument.ToString());
-                var lista = clienteSQL.Listar(); // Volver a cargar la lista
-
-                if (e.CommandName == "Editar")
-                {
-                    var c = lista.FirstOrDefault(x => x.Id == id);
-                    if (c != null)
-                    {
-                        hfEditingId.Value = c.Id.ToString();
-                        txtNombre.Text = c.Nombre;
-                        txtApellido.Text = c.Apellido;
-                        txtDocumento.Text = c.Documento;
-                        txtTelefono.Text = c.Telefono;
-                        txtEmail.Text = c.Email;
-                        txtDireccion.Text = c.Direccion;
-                        txtCiudad.Text = c.Ciudad;
-                        txtCP.Text = c.CP.ToString();
-
-                        pnlClienteForm.Visible = true;
-                        litTitulo.Text = "Editar Cliente";
-                        btnGuardar.Visible = false;
-                        btnModificar.Visible = true;
-                    }
-                }
-                else if (e.CommandName == "Eliminar")
-                {
-                    clienteSQL.Eliminar(id);
-                    BindGrid();
-                }
-            }
-            catch (Exception ex)
-            {
-                lblMensaje.Text = "Error: " + ex.Message;
-            }
-        }
-
-        protected void gvClientes_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        {
-            gvClientes.PageIndex = e.NewPageIndex;
-            BindGrid(txtBuscarClientes.Text.Trim()); // Mantener el filtro al paginar
         }
 
         protected void btnRefrescar_Click(object sender, EventArgs e)
         {
             txtBuscarClientes.Text = "";
+            gvClientes.PageIndex = 0;
             BindGrid();
+            lblMensaje.Visible = false;
             pnlClienteForm.Visible = false;
-            lblMensaje.Text = string.Empty;
         }
+
+        protected void gvClientes_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvClientes.PageIndex = e.NewPageIndex;
+            BindGrid(txtBuscarClientes.Text.Trim());
+        }
+
+        private void LimpiarFormulario()
+        {
+            hfEditingId.Value = "";
+            txtNombre.Text = "";
+            txtApellido.Text = "";
+            txtCedula.Text = "";
+            txtEmail.Text = "";
+            txtTelefono.Text = "";
+            txtDireccion.Text = "";
+        }
+
+        private void FillEstadisticas()
+        {
+            // Lógica simple para las tarjetas de estadísticas
+            var lista = clienteSQL.Listar();
+            lblTotalClientes.Text = lista.Count.ToString();
+            lblClientesActivos.Text = lista.Count.ToString(); // Por ahora igual al total
+
+            // Simulación de "Recientes" (podrías mejorarlo con SQL si tuvieras fecha de alta)
+            lblClientesRecientes.Text = "N/A";
+        }
+    }
+
+    // Clase simple para el historial
+    public class HistoryEntry
+    {
+        public DateTime Date { get; set; }
+        public string Action { get; set; }
+        public string Details { get; set; }
     }
 }

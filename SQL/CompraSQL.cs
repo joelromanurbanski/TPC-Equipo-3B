@@ -58,7 +58,6 @@ namespace SQL
                 datos.cerrarConexionTransaccional();
             }
         }
-
         /// Lista todas las compras, uniendo con Proveedor para obtener el nombre.
         public List<Compra> ListarCompras()
         {
@@ -93,7 +92,6 @@ namespace SQL
             catch (Exception ex) { throw ex; }
             finally { datos.cerrarConexion(); }
         }
-
         /// Actualiza el estado de una compra específica.
         public void ActualizarEstadoCompra(int idCompra, string nuevoEstado)
         {
