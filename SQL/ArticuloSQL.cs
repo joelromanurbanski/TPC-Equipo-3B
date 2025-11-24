@@ -10,7 +10,7 @@ namespace SQL
 {
     public class ArticuloSQL
     {
-        // LISTAR
+        // 1. LISTAR (Para GestionProducto)
         public List<Articulo> Listar()
         {
             List<Articulo> lista = new List<Articulo>();
@@ -62,7 +62,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // AGREGAR
+        // 2. AGREGAR (Para GestionProducto)
         public int AgregarYDevolverId(Articulo nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -92,7 +92,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // MODIFICAR
+        // 3. MODIFICAR (Para GestionProducto)
         public void Modificar(Articulo art)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -125,7 +125,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // ELIMINAR
+        // 4. ELIMINAR (Para GestionProducto)
         public void Eliminar(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -139,7 +139,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // GETBYID
+        // 5. GET BY ID (Para RegistroVenta)
         public Articulo GetById(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -179,7 +179,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // LISTAR POR PROVEEDOR
+        // 6. LISTAR POR PROVEEDOR (Para GestionProveedores)
         public List<Articulo> ListarPorProveedor(int idProveedor)
         {
             List<Articulo> lista = new List<Articulo>();
@@ -217,7 +217,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // BAJO STOCK
+        // 7. BAJO STOCK (Para PaneldeControl)
         public List<Articulo> ListarBajoStock(int top = 5)
         {
             List<Articulo> lista = new List<Articulo>();
@@ -250,7 +250,7 @@ namespace SQL
             finally { datos.cerrarConexion(); }
         }
 
-        // REPONER STOCK
+        // 8. REPONER STOCK (Para GestionPedidos)
         public void ReponerStock(List<DetalleVenta> detalles)
         {
             AccesoDatos datos = new AccesoDatos();

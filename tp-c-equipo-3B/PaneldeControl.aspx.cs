@@ -18,6 +18,10 @@ namespace tp_c_equipo_3B
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // --- ¡CORRECCIÓN IMPORTANTE! ---
+            // Quitamos el "if (!IsPostBack)" para forzar la actualización
+            // de los datos cada vez que se carga la página.
+
             CargarStatsCards();
             CargarBajoStock();
             CargarActividadReciente();
@@ -116,7 +120,7 @@ namespace tp_c_equipo_3B
         }
 
 
-        // Helpers para la UI de Actividad Reciente
+        // --- Helpers para la UI de Actividad Reciente ---
         protected string GetIconBgClass(string tipo)
         {
             return tipo == "Venta" ? "bg-success-20" : "bg-info-20";

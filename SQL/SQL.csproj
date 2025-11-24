@@ -52,6 +52,7 @@
     <Compile Include="MarcaSQL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProveedorSQL.cs" />
+    <Compile Include="UsuarioSQL.cs" />
     <Compile Include="VentaSQL.cs" />
   </ItemGroup>
   <ItemGroup>

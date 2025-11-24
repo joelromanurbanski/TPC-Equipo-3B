@@ -25,7 +25,7 @@ namespace SQL
             comando = new SqlCommand();
         }
 
-        // Métodos de Transacción
+        // --- Métodos de Transacción ---
         public void iniciarTransaccion()
         {
             try

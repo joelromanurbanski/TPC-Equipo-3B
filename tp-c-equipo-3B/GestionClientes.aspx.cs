@@ -182,7 +182,7 @@ namespace tp_c_equipo_3B
         }
     }
 
-    // Clase simple para el historial
+    // Clase simple para el historial (placeholder visual)
     public class HistoryEntry
     {
         public DateTime Date { get; set; }

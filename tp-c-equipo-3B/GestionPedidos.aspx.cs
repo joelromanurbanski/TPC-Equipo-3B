@@ -29,7 +29,7 @@ namespace tp_c_equipo_3B
             string estado = ddlFiltroEstado.SelectedValue;
             bool ordenAsc = ddlOrden.SelectedValue == "ASC";
 
-           
+            // --- LOGICA DE FECHAS ---
             DateTime? fechaInicio = null;
             DateTime? fechaFin = null;
 
@@ -42,7 +42,7 @@ namespace tp_c_equipo_3B
                 fechaFin = DateTime.Parse(txtFechaHasta.Text);
             }
 
-            
+            // Llamar al método con los nuevos parámetros
             gvVentas.DataSource = ventaSQL.ListarVentas(busqueda, estado, ordenAsc, fechaInicio, fechaFin);
             gvVentas.DataBind();
         }

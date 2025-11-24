@@ -61,6 +61,8 @@ namespace SQL
         {
             return $"FAC-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 4)}";
         }
+
+        // --- ¡MÉTODO ACTUALIZADO CON FECHAS! ---
         public List<Venta> ListarVentas(string busqueda = "", string estado = "Todos", bool ordenAscendente = false, DateTime? fechaInicio = null, DateTime? fechaFin = null)
         {
             List<Venta> lista = new List<Venta>();
@@ -114,7 +116,7 @@ namespace SQL
 
                 if (fechaInicio.HasValue) datos.setearParametro("@FechaInicio", fechaInicio.Value);
 
-
+                // Truco: Para la fecha fin, nos aseguramos de incluir hasta el último segundo del día
                 if (fechaFin.HasValue)
                 {
                     DateTime finDia = fechaFin.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);

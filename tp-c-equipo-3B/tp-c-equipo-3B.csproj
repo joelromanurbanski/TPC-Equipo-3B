@@ -126,7 +126,7 @@
     <Content Include="GestionProveedores.aspx" />
     <Content Include="GestionUsuarios.aspx" />
     <Content Include="Global.asax" />
-    <Content Include="InicioSesión.aspx" />
+    <Content Include="InicioSesion.aspx" />
     <Content Include="PaneldeControl.aspx" />
     <Content Include="RegistroCompra.aspx" />
     <Content Include="RegistroVenta.aspx" />
@@ -253,12 +253,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="InicioSesión.aspx.cs">
-      <DependentUpon>InicioSesión.aspx</DependentUpon>
+    <Compile Include="InicioSesion.aspx.cs">
+      <DependentUpon>InicioSesion.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="InicioSesión.aspx.designer.cs">
-      <DependentUpon>InicioSesión.aspx</DependentUpon>
+    <Compile Include="InicioSesion.aspx.designer.cs">
+      <DependentUpon>InicioSesion.aspx</DependentUpon>
     </Compile>
     <Compile Include="PaneldeControl.aspx.cs">
       <DependentUpon>PaneldeControl.aspx</DependentUpon>
