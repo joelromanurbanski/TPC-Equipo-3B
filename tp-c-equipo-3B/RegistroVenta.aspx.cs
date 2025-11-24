@@ -197,38 +197,37 @@ namespace tp_c_equipo_3B
 
         protected void btnGenerarVenta_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid) return;
-
             var items = (List<DetalleVenta>)ViewState[ViewStateKey_Items];
             if (items == null || items.Count == 0)
             {
-                MostrarMensaje("Debe agregar al menos un producto a la venta.");
+                MostrarMensaje("Debe agregar al menos un producto.");
                 return;
             }
 
             try
             {
-                Venta nuevaVenta = new Venta
+                Venta venta = new Venta
                 {
                     Cliente = new Cliente { Id = int.Parse(ddlCliente.SelectedValue) },
                     Fecha = DateTime.Now,
                     NumeroFactura = ventaSQL.GenerarNumeroFactura(),
                     Detalles = items,
-                    TotalVenta = decimal.Parse(lblTotal.Text, System.Globalization.NumberStyles.Currency)
+                    TotalVenta = decimal.Parse(lblTotal.Text, System.Globalization.NumberStyles.Currency),
+
+                    // Asignamos el usuario de la sesión
+                    Usuario = (Usuario)Session["usuario"]
                 };
 
-                int idVenta = ventaSQL.RegistrarVenta(nuevaVenta);
+                ventaSQL.RegistrarVenta(venta);
 
                 InicializarPagina();
-
-                MostrarMensaje($"¡Venta registrada con éxito! Factura N°: {nuevaVenta.NumeroFactura}", true);
+                MostrarMensaje($"¡Venta registrada! Factura N°: {venta.NumeroFactura}", true);
             }
             catch (Exception ex)
             {
                 MostrarMensaje("Error al guardar la venta: " + ex.Message);
             }
         }
-
         protected void btnCancelar_Click(object sender, EventArgs e)
         {
             InicializarPagina();

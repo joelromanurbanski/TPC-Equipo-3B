@@ -27,7 +27,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="admin@admin.com" />
+                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="" />
             </div>
             
             <div class="mb-4">

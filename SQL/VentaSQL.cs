@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using Dominio;
 using System.Data.SqlClient;
 
+
 namespace SQL
 {
     public class VentaSQL
     {
+        // --- REGISTRAR VENTA (Sin cambios) ---
         public int RegistrarVenta(Venta venta)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -17,9 +19,10 @@ namespace SQL
             {
                 datos.iniciarTransaccion();
 
-                datos.setearConsulta("INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) OUTPUT INSERTED.Id VALUES (@Fecha, @IdCliente, @NumeroFactura, @Total, @Estado)");
+                datos.setearConsulta("INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) OUTPUT INSERTED.Id VALUES (@Fecha, @IdCliente, @IdUsuario, @NumeroFactura, @Total, @Estado)");
                 datos.setearParametro("@Fecha", venta.Fecha);
                 datos.setearParametro("@IdCliente", venta.Cliente.Id);
+                datos.setearParametro("@IdUsuario", venta.Usuario != null ? (object)venta.Usuario.Id : DBNull.Value);
                 datos.setearParametro("@NumeroFactura", venta.NumeroFactura);
                 datos.setearParametro("@Total", venta.TotalVenta);
                 datos.setearParametro("@Estado", "En Preparación");
@@ -62,67 +65,68 @@ namespace SQL
             return $"FAC-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 4)}";
         }
 
-        // --- ¡MÉTODO ACTUALIZADO CON FECHAS! ---
-        public List<Venta> ListarVentas(string busqueda = "", string estado = "Todos", bool ordenAscendente = false, DateTime? fechaInicio = null, DateTime? fechaFin = null)
+        // --- ¡MÉTODO DE LISTADO CORREGIDO! ---
+        public List<Venta> ListarVentas(string busqueda = "", string estado = "Todos", bool ordenAscendente = false, DateTime? fechaInicio = null, DateTime? fechaFin = null, int? idUsuario = null)
         {
             List<Venta> lista = new List<Venta>();
             AccesoDatos datos = new AccesoDatos();
             try
             {
+                // 1. Construir el texto de la consulta
                 string consulta = @"
                     SELECT DISTINCT V.Id, V.Fecha, V.NumeroFactura, V.TotalVenta, V.Estado,
-                           C.Nombre, C.Apellido, C.Documento
+                           C.Nombre, C.Apellido, C.Documento,
+                           U.Nombre AS VendedorNombre, U.Apellido AS VendedorApellido
                     FROM Venta V
                     INNER JOIN Cliente C ON V.IdCliente = C.Id
+                    LEFT JOIN Usuario U ON V.IdUsuario = U.Id
                     LEFT JOIN DetalleVenta DV ON V.Id = DV.IdVenta
                     LEFT JOIN Articulo A ON DV.IdArticulo = A.Id
                     WHERE 1=1";
 
-                // Filtro de Texto
                 if (!string.IsNullOrEmpty(busqueda))
-                {
                     consulta += " AND (C.Nombre LIKE @Busqueda OR C.Apellido LIKE @Busqueda OR C.Documento LIKE @Busqueda OR V.NumeroFactura LIKE @Busqueda OR A.Nombre LIKE @Busqueda)";
-                }
 
-                // Filtro de Estado
                 if (estado != "Todos")
-                {
                     consulta += " AND V.Estado = @FiltroEstado";
-                }
 
-                // Filtro de Fecha Inicio
                 if (fechaInicio.HasValue)
-                {
                     consulta += " AND V.Fecha >= @FechaInicio";
-                }
 
-                // Filtro de Fecha Fin
                 if (fechaFin.HasValue)
-                {
                     consulta += " AND V.Fecha <= @FechaFin";
-                }
 
-                // Ordenamiento
+                if (idUsuario.HasValue && idUsuario.Value > 0)
+                    consulta += " AND V.IdUsuario = @IdUsuario";
+
                 if (ordenAscendente)
                     consulta += " ORDER BY V.Fecha ASC";
                 else
                     consulta += " ORDER BY V.Fecha DESC";
 
+                // 2. Setear la consulta (Esto limpia los parámetros viejos)
                 datos.setearConsulta(consulta);
 
-                // Asignación de Parámetros
-                if (!string.IsNullOrEmpty(busqueda)) datos.setearParametro("@Busqueda", "%" + busqueda + "%");
-                if (estado != "Todos") datos.setearParametro("@FiltroEstado", estado);
+                // 3. Agregar los parámetros AHORA (después de setearConsulta)
+                if (!string.IsNullOrEmpty(busqueda))
+                    datos.setearParametro("@Busqueda", "%" + busqueda + "%");
 
-                if (fechaInicio.HasValue) datos.setearParametro("@FechaInicio", fechaInicio.Value);
+                if (estado != "Todos")
+                    datos.setearParametro("@FiltroEstado", estado);
 
-                // Truco: Para la fecha fin, nos aseguramos de incluir hasta el último segundo del día
+                if (fechaInicio.HasValue)
+                    datos.setearParametro("@FechaInicio", fechaInicio.Value);
+
                 if (fechaFin.HasValue)
                 {
                     DateTime finDia = fechaFin.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
                     datos.setearParametro("@FechaFin", finDia);
                 }
 
+                if (idUsuario.HasValue && idUsuario.Value > 0)
+                    datos.setearParametro("@IdUsuario", idUsuario.Value);
+
+                // 4. Ejecutar
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())
@@ -139,6 +143,11 @@ namespace SQL
                             Nombre = (string)datos.Lector["Nombre"],
                             Apellido = (string)datos.Lector["Apellido"],
                             Documento = (string)datos.Lector["Documento"]
+                        },
+                        Usuario = new Usuario
+                        {
+                            Nombre = datos.Lector["VendedorNombre"] != DBNull.Value ? (string)datos.Lector["VendedorNombre"] : "Sistema",
+                            Apellido = datos.Lector["VendedorApellido"] != DBNull.Value ? (string)datos.Lector["VendedorApellido"] : ""
                         }
                     });
                 }

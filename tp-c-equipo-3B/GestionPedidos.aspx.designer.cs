@@ -33,6 +33,15 @@ namespace tp_c_equipo_3B
         protected global::System.Web.UI.WebControls.DropDownList ddlFiltroEstado;
 
         /// <summary>
+        /// Control ddlFiltroVendedor.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlFiltroVendedor;
+
+        /// <summary>
         /// Control ddlOrden.
         /// </summary>
         /// <remarks>
@@ -40,6 +49,15 @@ namespace tp_c_equipo_3B
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlOrden;
+
+        /// <summary>
+        /// Control btnBuscar.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnBuscar;
 
         /// <summary>
         /// Control txtFechaDesde.
@@ -58,15 +76,6 @@ namespace tp_c_equipo_3B
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtFechaHasta;
-
-        /// <summary>
-        /// Control btnBuscar.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnBuscar;
 
         /// <summary>
         /// Control btnRefrescar.

@@ -7,44 +7,60 @@ using System.Web.UI.WebControls;
 using Dominio;
 using SQL;
 
-
 namespace tp_c_equipo_3B
 {
     public partial class GestionPedidos : System.Web.UI.Page
     {
         private VentaSQL ventaSQL = new VentaSQL();
         private ArticuloSQL articuloSQL = new ArticuloSQL();
+        private UsuarioSQL usuarioSQL = new UsuarioSQL(); // Necesario para cargar vendedores
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
+                CargarVendedores();
                 BindGrid();
             }
         }
 
+        private void CargarVendedores()
+        {
+            // Cargar lista de usuarios para el filtro
+            List<Usuario> usuarios = usuarioSQL.Listar();
+            ddlFiltroVendedor.DataSource = usuarios;
+            ddlFiltroVendedor.DataTextField = "NombreCompleto";
+            ddlFiltroVendedor.DataValueField = "Id";
+            ddlFiltroVendedor.DataBind();
+
+            // Agregar opción por defecto
+            ddlFiltroVendedor.Items.Insert(0, new ListItem("Vendedor: Todos", "0"));
+        }
+
         private void BindGrid()
         {
+            // Filtros
             string busqueda = txtBuscar.Text.Trim();
             string estado = ddlFiltroEstado.SelectedValue;
             bool ordenAsc = ddlOrden.SelectedValue == "ASC";
+            int idUsuario = int.Parse(ddlFiltroVendedor.SelectedValue); // Filtro de Vendedor
 
-            // --- LOGICA DE FECHAS ---
+            // Fechas
             DateTime? fechaInicio = null;
             DateTime? fechaFin = null;
+            if (!string.IsNullOrEmpty(txtFechaDesde.Text)) fechaInicio = DateTime.Parse(txtFechaDesde.Text);
+            if (!string.IsNullOrEmpty(txtFechaHasta.Text)) fechaFin = DateTime.Parse(txtFechaHasta.Text);
 
-            if (!string.IsNullOrEmpty(txtFechaDesde.Text))
+            try
             {
-                fechaInicio = DateTime.Parse(txtFechaDesde.Text);
+                // Pasar todos los filtros al método SQL
+                gvVentas.DataSource = ventaSQL.ListarVentas(busqueda, estado, ordenAsc, fechaInicio, fechaFin, idUsuario);
+                gvVentas.DataBind();
             }
-            if (!string.IsNullOrEmpty(txtFechaHasta.Text))
+            catch (Exception ex)
             {
-                fechaFin = DateTime.Parse(txtFechaHasta.Text);
+                MostrarMensaje("Error al cargar: " + ex.Message, false);
             }
-
-            // Llamar al método con los nuevos parámetros
-            gvVentas.DataSource = ventaSQL.ListarVentas(busqueda, estado, ordenAsc, fechaInicio, fechaFin);
-            gvVentas.DataBind();
         }
 
         protected void gvVentas_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -65,8 +81,7 @@ namespace tp_c_equipo_3B
             txtBuscar.Text = "";
             ddlFiltroEstado.SelectedValue = "Todos";
             ddlOrden.SelectedValue = "DESC";
-
-            // Limpiar fechas
+            ddlFiltroVendedor.SelectedValue = "0"; // Resetear vendedor
             txtFechaDesde.Text = "";
             txtFechaHasta.Text = "";
 
@@ -86,8 +101,8 @@ namespace tp_c_equipo_3B
             switch (estado)
             {
                 case "En Preparación": return "gv-estado-EnPreparacion";
-                case "Enviado": return "gv-estado-Enviado";
                 case "Listo para Despachar": return "gv-estado-Listo";
+                case "Enviado": return "gv-estado-Enviado";
                 case "Entregado": return "gv-estado-Entregado";
                 case "Cancelado": return "gv-estado-Cancelado";
                 default: return "bg-light text-dark";
@@ -102,8 +117,8 @@ namespace tp_c_equipo_3B
                 if (ddlEstado != null)
                 {
                     string estadoActual = DataBinder.Eval(e.Row.DataItem, "Estado").ToString();
-                    if (ddlEstado.Items.FindByValue(estadoActual) != null)
-                        ddlEstado.SelectedValue = estadoActual;
+                    ListItem item = ddlEstado.Items.FindByValue(estadoActual);
+                    if (item != null) ddlEstado.SelectedValue = estadoActual;
 
                     if (estadoActual == "Entregado" || estadoActual == "Cancelado")
                     {
@@ -129,8 +144,9 @@ namespace tp_c_equipo_3B
             {
                 try
                 {
-                    GridViewRow row = (GridViewRow)((LinkButton)e.CommandSource).NamingContainer;
+                    GridViewRow row = (GridViewRow)((System.Web.UI.Control)e.CommandSource).NamingContainer;
                     DropDownList ddlEstado = (DropDownList)row.FindControl("ddlEstado");
+
                     int idVenta = Convert.ToInt32(e.CommandArgument);
                     string nuevoEstado = ddlEstado.SelectedValue;
 
@@ -138,28 +154,30 @@ namespace tp_c_equipo_3B
 
                     if (nuevoEstado == "Cancelado")
                     {
-                        List<DetalleVenta> detalles = ventaSQL.ListarDetallesPorVenta(idVenta);
+                        var detalles = ventaSQL.ListarDetallesPorVenta(idVenta);
                         articuloSQL.ReponerStock(detalles);
-
-                        lblMensaje.Text = $"Pedido #{idVenta} cancelado. Stock repuesto.";
-                        lblMensaje.CssClass = "alert alert-warning";
+                        MostrarMensaje($"Pedido #{idVenta} cancelado. Stock devuelto al inventario.", false);
+                        lblMensaje.CssClass = "alert alert-warning d-block mb-3 rounded-3";
                     }
                     else
                     {
-                        lblMensaje.Text = $"Estado actualizado a '{nuevoEstado}'.";
-                        lblMensaje.CssClass = "alert alert-success";
+                        MostrarMensaje($"Estado del pedido #{idVenta} actualizado a '{nuevoEstado}'.", true);
                     }
 
-                    lblMensaje.Visible = true;
                     BindGrid();
                 }
                 catch (Exception ex)
                 {
-                    lblMensaje.Text = "Error: " + ex.Message;
-                    lblMensaje.CssClass = "alert alert-danger";
-                    lblMensaje.Visible = true;
+                    MostrarMensaje("Error: " + ex.Message, false);
                 }
             }
+        }
+
+        private void MostrarMensaje(string texto, bool exito)
+        {
+            lblMensaje.Text = texto;
+            lblMensaje.CssClass = exito ? "alert alert-success d-block mb-3 rounded-3" : "alert alert-danger d-block mb-3 rounded-3";
+            lblMensaje.Visible = true;
         }
     }
 }

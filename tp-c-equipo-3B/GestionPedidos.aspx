@@ -8,6 +8,7 @@
         .gv-estado-Enviado { background-color: #64b5f6; color: #000 !important; }
         .gv-estado-Entregado { background-color: #66bb6a; color: #000 !important; }
         .gv-estado-Cancelado { background-color: #ef5350; color: #000 !important; }
+        .form-control-sm, .form-select-sm, .btn-sm { font-size: 0.875rem; }
     </style>
 </asp:Content>
 
@@ -18,19 +19,19 @@
             <h1 class="h2 mb-0 fw-bold text-dark">Gestión de Pedidos</h1>
         </div>
         
-        <div class="card mb-4 border-0 shadow-sm rounded-3">
+        <div class="card mb-4 border-0 shadow-sm rounded-3 bg-light">
             <div class="card-body">
                 
                 <div class="row g-2 mb-2">
-                    <div class="col-md-6">
+                    <div class="col-lg-3">
                         <div class="input-group">
                              <span class="input-group-text bg-white border-end-0"><i class="material-symbols-outlined text-muted">search</i></span>
-                             <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control border-start-0" Placeholder="Buscar cliente, factura..." />
+                             <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control border-start-0" Placeholder="Buscar" />
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-lg-2">
                         <asp:DropDownList ID="ddlFiltroEstado" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="Todos">Todos los Estados</asp:ListItem>
+                            <asp:ListItem Value="Todos">Estado: Todos</asp:ListItem>
                             <asp:ListItem Value="En Preparación">En Preparación</asp:ListItem>
                             <asp:ListItem Value="Listo para Despachar">Listo para Despachar</asp:ListItem>
                             <asp:ListItem Value="Enviado">Enviado</asp:ListItem>
@@ -38,26 +39,33 @@
                             <asp:ListItem Value="Cancelado">Cancelado</asp:ListItem>
                         </asp:DropDownList>
                     </div>
-                    <div class="col-md-3">
-                         <asp:DropDownList ID="ddlOrden" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlOrden_SelectedIndexChanged">
+                    <div class="col-lg-3">
+                        <asp:DropDownList ID="ddlFiltroVendedor" runat="server" CssClass="form-select">
+                            <asp:ListItem Value="0">Vendedor: Todos</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+                    <div class="col-lg-2">
+                        <asp:DropDownList ID="ddlOrden" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlOrden_SelectedIndexChanged">
                             <asp:ListItem Value="DESC">Más Recientes</asp:ListItem>
                             <asp:ListItem Value="ASC">Más Antiguos</asp:ListItem>
                         </asp:DropDownList>
+                    </div>
+                     <div class="col-lg-2 d-grid">
+                        <asp:Button ID="btnBuscar" runat="server" Text="Filtrar" CssClass="btn btn-primary fw-bold" OnClick="btnBuscar_Click" />
                     </div>
                 </div>
 
                 <div class="row g-2 align-items-end">
                     <div class="col-md-3">
-                        <label class="form-label small text-muted mb-1">Desde</label>
+                        <label class="form-label small text-muted mb-1 fw-bold">Desde</label>
                         <asp:TextBox ID="txtFechaDesde" runat="server" TextMode="Date" CssClass="form-control form-control-sm" />
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small text-muted mb-1">Hasta</label>
+                        <label class="form-label small text-muted mb-1 fw-bold">Hasta</label>
                         <asp:TextBox ID="txtFechaHasta" runat="server" TextMode="Date" CssClass="form-control form-control-sm" />
                     </div>
-                    <div class="col-md-6 d-flex gap-2">
-                        <asp:Button ID="btnBuscar" runat="server" Text="Aplicar Filtros" CssClass="btn btn-primary w-100 fw-semibold btn-sm" OnClick="btnBuscar_Click" />
-                        <asp:Button ID="btnRefrescar" runat="server" Text="Limpiar Todo" CssClass="btn btn-light border w-100 btn-sm" OnClick="btnRefrescar_Click" />
+                    <div class="col-md-2">
+                         <asp:Button ID="btnRefrescar" runat="server" Text="Limpiar Filtros" CssClass="btn btn-outline-secondary btn-sm w-100" OnClick="btnRefrescar_Click" />
                     </div>
                 </div>
 
@@ -74,16 +82,17 @@
                     DataKeyNames="Id"
                     OnRowCommand="gvVentas_RowCommand"
                     OnRowDataBound="gvVentas_RowDataBound"
-                    EmptyDataText="No se encontraron ventas con esos filtros."
+                    EmptyDataText="No se encontraron ventas con los filtros aplicados."
                     AllowPaging="True" PageSize="10" OnPageIndexChanging="gvVentas_PageIndexChanging"
                     GridLines="None">
                     
-                    <HeaderStyle CssClass="bg-light text-uppercase small fw-bold text-secondary" Height="50px" />
+                    <HeaderStyle CssClass="bg-white text-uppercase small fw-bold text-secondary border-bottom" Height="50px" />
                     
                     <Columns>
-                        <asp:BoundField DataField="NumeroFactura" HeaderText="Factura" ItemStyle-CssClass="fw-medium" />
+                        <asp:BoundField DataField="NumeroFactura" HeaderText="Factura" ItemStyle-CssClass="fw-medium font-monospace" />
                         <asp:BoundField DataField="Cliente.NombreCompleto" HeaderText="Cliente" />
-                        <asp:BoundField DataField="Fecha" HeaderText="Fecha" DataFormatString="{0:dd/MM/yyyy}" />
+                        <asp:BoundField DataField="Usuario.NombreCompleto" HeaderText="Vendedor" ItemStyle-CssClass="text-muted small" />
+                        <asp:BoundField DataField="Fecha" HeaderText="Fecha" DataFormatString="{0:dd/MM/yyyy HH:mm}" />
                         <asp:BoundField DataField="TotalVenta" HeaderText="Total" DataFormatString="{0:C}" ItemStyle-CssClass="fw-bold text-dark" />
                         
                         <asp:TemplateField HeaderText="Estado">
@@ -94,17 +103,18 @@
                             </ItemTemplate>
                         </asp:TemplateField>
 
-                        <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="280px">
+                        <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="260px">
                             <ItemTemplate>
-                                <div class="d-flex gap-2 align-items-center">
+                                <div class="d-flex gap-2 align-items-center justify-content-end pe-3">
+                                    
                                     <asp:LinkButton ID="btnVerDetalle" runat="server" 
-                                        CssClass="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                        CssClass="btn btn-sm btn-outline-primary d-flex align-items-center px-2"
                                         CommandName="VerDetalle" CommandArgument='<%# Eval("Id") %>' 
                                         ToolTip="Ver productos">
                                         <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
                                     </asp:LinkButton>
 
-                                    <asp:DropDownList ID="ddlEstado" runat="server" CssClass="form-select form-select-sm" style="width: 140px;">
+                                    <asp:DropDownList ID="ddlEstado" runat="server" CssClass="form-select form-select-sm" style="width: 130px;">
                                         <asp:ListItem Value="En Preparación">En Preparación</asp:ListItem>
                                         <asp:ListItem Value="Listo para Despachar">Listo</asp:ListItem>
                                         <asp:ListItem Value="Enviado">Enviado</asp:ListItem>
@@ -113,16 +123,17 @@
                                     </asp:DropDownList>
                                     
                                     <asp:LinkButton ID="btnActualizarEstado" runat="server" 
-                                        CssClass="btn btn-sm btn-light border d-flex align-items-center"
+                                        CssClass="btn btn-sm btn-success d-flex align-items-center px-2"
                                         CommandName="ActualizarEstado" CommandArgument='<%# Eval("Id") %>'
-                                        ToolTip="Guardar estado" CausesValidation="false">
+                                        ToolTip="Guardar nuevo estado" CausesValidation="false">
                                         <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
                                     </asp:LinkButton>
+
                                 </div>
                             </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
-                    <PagerStyle CssClass="pagination-container p-3" HorizontalAlign="Center" />
+                    <PagerStyle CssClass="pagination-container p-3 bg-light" HorizontalAlign="Center" />
                 </asp:GridView>
             </div>
         </div>
@@ -130,10 +141,10 @@
 
     <div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
-          <div class="modal-header bg-light">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header bg-primary text-white">
             <h5 class="modal-title fw-bold">Detalle del Pedido #<asp:Label ID="lblModalIdVenta" runat="server" /></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body p-0">
               <asp:GridView ID="gvDetallePedido" runat="server" 
