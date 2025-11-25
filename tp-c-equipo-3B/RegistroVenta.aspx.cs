@@ -220,6 +220,23 @@ namespace tp_c_equipo_3B
 
                 ventaSQL.RegistrarVenta(venta);
 
+                string email = txtEmail.Text;
+
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    EmailService emailService = new EmailService();
+
+                    string asunto = "Confirmación de compra";
+                    string cuerpo =
+                        $"Tu compra fue registrada correctamente.<br>" +
+                        $"Factura N°: {venta.NumeroFactura}<br>" +
+                        $"Total: {venta.TotalVenta:C}<br><br>" +
+                        "¡Gracias por tu compra!";
+
+                    emailService.armarCorreo(email, asunto, cuerpo);
+                    emailService.enviarEmail();
+                }
+
                 InicializarPagina();
                 MostrarMensaje($"¡Venta registrada! Factura N°: {venta.NumeroFactura}", true);
             }
