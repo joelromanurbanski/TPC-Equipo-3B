@@ -220,9 +220,10 @@ namespace tp_c_equipo_3B
 
                 ventaSQL.RegistrarVenta(venta);
 
-                string email = txtEmail.Text;
+                string email1 = txtEmail.Text;
+                string email2 = txtEmail2.Text;
 
-                if (!string.IsNullOrWhiteSpace(email))
+                if (!string.IsNullOrWhiteSpace(email1))
                 {
                     EmailService emailService = new EmailService();
 
@@ -233,8 +234,16 @@ namespace tp_c_equipo_3B
                         $"Total: {venta.TotalVenta:C}<br><br>" +
                         "¡Gracias por tu compra!";
 
-                    emailService.armarCorreo(email, asunto, cuerpo);
+
+                    emailService.armarCorreo(email1, asunto, cuerpo);
                     emailService.enviarEmail();
+
+
+                    if (!string.IsNullOrWhiteSpace(email2))
+                    {
+                        emailService.armarCorreo(email2, asunto, cuerpo);
+                        emailService.enviarEmail();
+                    }
                 }
 
                 InicializarPagina();

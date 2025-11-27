@@ -47,6 +47,9 @@
 
                                     <label class="form-label mt-3" for="<%= txtEmail.ClientID %>">Email Cliente</label>
                                     <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" />
+
+                                     <label class="form-label mt-3" for="<%= txtEmail2.ClientID %>">Email Alternativo (opcional)</label>
+                                    <asp:TextBox ID="txtEmail2" runat="server" CssClass="form-control" />
                                 </div>
 
                                 <a href="GestionClientes.aspx" class="flex-shrink-0 btn bg-primary-light hover-bg-primary-light text-primary d-flex align-items-center justify-content-center"
