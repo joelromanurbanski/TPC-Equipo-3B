@@ -81,7 +81,7 @@ CREATE TABLE Compra (
     Fecha DATETIME NOT NULL DEFAULT GETDATE(),
     IdProveedor INT NOT NULL,
     TotalCompra DECIMAL(18,2),
-    Estado NVARCHAR(50) NOT NULL DEFAULT 'Solicitado' -- ¡COLUMNA DE ESTADO!
+    Estado NVARCHAR(50) NOT NULL DEFAULT 'Solicitado'
 );
 
 CREATE TABLE DetalleCompra (
@@ -100,7 +100,7 @@ CREATE TABLE Venta (
     IdCliente INT NOT NULL,
     NumeroFactura NVARCHAR(100) NOT NULL,
     TotalVenta DECIMAL(18,2),
-    Estado NVARCHAR(50) NOT NULL DEFAULT 'En Preparación' -- ¡COLUMNA DE ESTADO!
+    Estado NVARCHAR(50) NOT NULL DEFAULT 'En Preparación' 
 );
 
 CREATE TABLE DetalleVenta (
@@ -167,6 +167,43 @@ GO
 -- Relaciones Articulo-Proveedor
 INSERT INTO ArticuloProveedor (IdArticulo, IdProveedor) VALUES (1, 1), (1, 2), (2, 4), (3, 6), (4, 2);
 GO
+
+USE GestionNegocio;
+GO
+
+-- 1. Actualizar Galaxy S23 (A001)
+UPDATE Articulo 
+SET UrlImagen = 'https://http2.mlstatic.com/D_NQ_NP_2X_938352-MLA96867918905_102025-F.webp',
+    StockActual = 30
+WHERE Codigo = 'A001';
+
+-- 2. Actualizar Lenovo Thinkpad (A002)
+UPDATE Articulo 
+SET UrlImagen = 'https://http2.mlstatic.com/D_624497-MLA95700803262_102025-C.jpg' ,
+    StockActual = 30
+WHERE Codigo = 'A002';
+
+-- 3. Actualizar ASUS VivoBook (A003) con Precios
+UPDATE Articulo 
+SET 
+    UrlImagen = 'https://mexx-img-2019.s3.amazonaws.com/NOTEBOOK-Asus-Vivobook-Go-Core-i3-8Gb-Ssd-256-15-Us-Win11_48442_1.jpeg',
+    StockActual = 30,
+    UltimoPrecioCompra = 450000.00,  -- Precio de Costo (Stock)
+    PorcentajeGanancia = 30.00       -- Margen de Ganancia (Define el precio de venta)
+WHERE Codigo = 'A003';
+
+GO
+PRINT 'Artículo A003 actualizado con stock y precios.'
+
+-- 4. Actualizar Poco X7 Pro (PX7 o A004)
+UPDATE Articulo 
+SET UrlImagen = 'https://images.fravega.com/f1000/944ca2bcfff2dae547ecf8858aa7e760.jpg',
+    StockActual = 30
+WHERE Codigo = 'PX7' OR Codigo = 'A004';
+
+GO
+PRINT 'Artículos actualizados correctamente.'
+
 
 -- 10 Clientes
 INSERT INTO Cliente (Documento, Nombre, Apellido, Email, Telefono, Direccion, Ciudad, CP)
@@ -491,7 +528,172 @@ UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 1;
 
 GO
 
-PRINT 'Base de datos GestionNegocio creada y poblada con éxito.'
+
+USE GestionNegocio;
+GO
+
+-- === 10 NUEVAS VENTAS ADICIONALES ===
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-11', 7, 'FAC-20251211-5510', 986681.64, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 2, 2, 493340.82, 986681.64);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 2;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-12', 5, 'FAC-20251212-1997', 855392.18, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 1, 855392.18, 855392.18);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 4;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-13', 3, 'FAC-20251213-1761', 1710784.36, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 2, 855392.18, 1710784.36);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 4;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-14', 10, 'FAC-20251214-1167', 1710784.36, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 2, 855392.18, 1710784.36);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 4;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-15', 4, 'FAC-20251215-7287', 493340.82, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 2, 1, 493340.82, 493340.82);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 2;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-16', 8, 'FAC-20251216-9231', 1080000.0, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 3, 2, 540000.0, 1080000.0);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 3;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-17', 5, 'FAC-20251217-2191', 540000.0, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 3, 1, 540000.0, 540000.0);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 3;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-18', 5, 'FAC-20251218-4854', 855392.18, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 1, 855392.18, 855392.18);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 4;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-19', 2, 'FAC-20251219-5765', 855392.18, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 1, 855392.18, 855392.18);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 4;
+
+INSERT INTO Venta (Fecha, IdCliente, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-20', 7, 'FAC-20251220-9274', 2024858.78, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 1, 2, 1012429.39, 2024858.78);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 1;
+
+GO
+PRINT '10 Ventas adicionales agregadas correctamente.'
+
+USE GestionNegocio;
+GO
+
+-- === 10 VENTAS ADICIONALES ===
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-21 00:00:00', 9, 1, 'FAC-20251221-8865', 540000.0, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 3, 1, 540000.0, 540000.0);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 3;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-22 00:00:00', 1, 1, 'FAC-20251222-6395', 1080000.0, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 3, 2, 540000.0, 1080000.0);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 3;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-23 00:00:00', 6, 1, 'FAC-20251223-5018', 1012429.39, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 1, 1, 1012429.39, 1012429.39);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 1;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-24 00:00:00', 6, 1, 'FAC-20251224-4895', 986681.64, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 2, 2, 493340.82, 986681.64);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 2;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-25 00:00:00', 4, 2, 'FAC-20251225-1628', 986681.64, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 2, 2, 493340.82, 986681.64);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 2;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-26 00:00:00', 3, 2, 'FAC-20251226-5830', 1012429.39, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 1, 1, 1012429.39, 1012429.39);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 1;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-27 00:00:00', 5, 2, 'FAC-20251227-1728', 855392.18, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 1, 855392.18, 855392.18);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 4;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-28 00:00:00', 5, 1, 'FAC-20251228-8293', 986681.64, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 2, 2, 493340.82, 986681.64);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 2;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-29 00:00:00', 10, 1, 'FAC-20251229-2286', 855392.18, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 1, 855392.18, 855392.18);
+UPDATE Articulo SET StockActual = StockActual - 1 WHERE Id = 4;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-30 00:00:00', 1, 1, 'FAC-20251230-6979', 1710784.36, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 2, 855392.18, 1710784.36);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 4;
+
+GO
+PRINT '10 Ventas mas agregadas exitosamente.'
+
+USE GestionNegocio;
+GO
+
+-- === 5 VENTAS ADICIONALES ===
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2025-12-31 00:00:00', 8, 2, 'FAC-20251231-6018', 986681.64, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 2, 2, 493340.82, 986681.64);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 2;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2026-01-01 00:00:00', 4, 1, 'FAC-20260101-2891', 1080000.0, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 3, 2, 540000.0, 1080000.0);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 3;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2026-01-02 00:00:00', 5, 2, 'FAC-20260102-5956', 2024858.78, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 1, 2, 1012429.39, 2024858.78);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 1;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2026-01-03 00:00:00', 6, 1, 'FAC-20260103-1346', 1710784.36, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 2, 855392.18, 1710784.36);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 4;
+
+DECLARE @LastVentaID int;
+INSERT INTO Venta (Fecha, IdCliente, IdUsuario, NumeroFactura, TotalVenta, Estado) VALUES ('2026-01-04 00:00:00', 4, 1, 'FAC-20260104-9951', 1710784.36, 'Entregado');
+SET @LastVentaID = SCOPE_IDENTITY();
+INSERT INTO DetalleVenta (IdVenta, IdArticulo, Cantidad, PrecioUnitario, Subtotal) VALUES (@LastVentaID, 4, 2, 855392.18, 1710784.36);
+UPDATE Articulo SET StockActual = StockActual - 2 WHERE Id = 4;
+
+GO
+PRINT '5 Ventas de Año Nuevo agregadas.'
+
 
 
 -- 1. Agregar columna IdUsuario (permitimos NULL al principio para las ventas viejas)
